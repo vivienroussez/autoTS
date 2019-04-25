@@ -1,0 +1,6 @@
+exportPattern("^[[:alpha:]]+")
+import(lubridate)
+import(dplyr)
+import(forecast)
+import(prophet)
+import(ggplot2)

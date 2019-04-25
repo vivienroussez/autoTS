@@ -1,0 +1,22 @@
+Package: autoTS
+Type: Package
+Title: What the Package Does (Title Case)
+Version: 0.1.0
+Author: Vivien Roussez
+Maintainer: Vivien Roussez <vivien.roussez@gmail.com>
+Description: This packages provides a set of functions that
+    helps to model and make predictions for univariate time series.
+License: What license is it under?
+Encoding: UTF-8
+LazyData: true
+Imports:
+    stats,
+    dplyr,
+    magrittr,
+    lubridate,
+    tidyr,
+    forecast,
+    ggplot2
+Depends:
+    prophet
+RoxygenNote: 6.1.1
