@@ -6,7 +6,7 @@ This R package is meant to provide a high-level interface to make **automated** 
 
 As of version 0.1, it is possible to deal with daily, weekly, monthly or quarterly time series.
 
-In order to be the more generic possible, the input required by this package is :
+In order to be as generic as possible, the input required by this package is :
 
 - a vector of dates, such that [lubridate](https://lubridate.tidyverse.org/) can parse it
 - a vector of the same size as the previous, contraining the values for each datetime
