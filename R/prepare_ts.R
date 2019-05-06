@@ -63,7 +63,7 @@ complete.ts <- function(dates,values,freq,complete=0) ### creates explicit 0 or 
 #' @example library(lubridate)
 #' library(dplyr)
 #' library(ggplot2)
-#' dates <- seq(as_date("2000-01-01"),as_date("2010-12-31"),"quarter")
+#' dates <- seq(lubridate::as_date("2000-01-01"),lubridate::as_date("2010-12-31"),"quarter")
 #' values <- rnorm(length(dates))
 #' my.ts <- prepare.ts(dates,values,"month",complete = 0)
 #' plot(my.ts$obj.ts)
@@ -76,7 +76,7 @@ prepare.ts <- function(dates,values,freq,complete=0) ### prepare object ready to
 
   # create a ts object for the forecast package out of this completed TS
   ff <- getFrequency(freq)
-  ts <- stats::ts(dd$val,start=decimal_date(min(dd$date)),frequency=ff)
+  ts <- stats::ts(dd$val,start=lubridate::decimal_date(min(dd$date)),frequency=ff)
   return(list(obj.ts=ts,obj.df=dd,freq.num=ff,freq.alpha=freq))
 
 }

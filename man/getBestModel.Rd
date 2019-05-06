@@ -26,7 +26,8 @@ getBestModel(dates, values, freq, complete = 0, n_test = NA,
 \item{algos}{A list containing the algorithms to test}
 }
 \value{
-A character string with the name of the best method
+A list contraining a character string with the name of the best method,
+a gg object with the comparison between algorithms and a dataframe with predictions of all tried algorithms
 }
 \description{
 Implement selected algorithms of the package, train them without the last observed year

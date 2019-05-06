@@ -46,7 +46,8 @@ my.predictions <- function(prepedTS,algos=list(prophet=my.prophet,ets=my.ets, sa
 #' @param graph A boolean, if TRUE, comparison of algorithms is plotted
 #' @export
 #' @importFrom magrittr %>%
-#' @return A character string with the name of the best method
+#' @return A list contraining a character string with the name of the best method,
+#' a gg object with the comparison between algorithms and a dataframe with predictions of all tried algorithms
 #' @example library(lubridate)
 #' library(dplyr)
 #' library(ggplot2)
@@ -54,7 +55,7 @@ my.predictions <- function(prepedTS,algos=list(prophet=my.prophet,ets=my.ets, sa
 #' values <- rnorm(length(dates))
 #' implement <- getBestModel(dates,values,freq = "month",algos = list(my.sarima,my.ets))
 #' res <- prepare.ts(dates,values,freq = "month") %>%
-#'   my.predictions(algos =list(get(implement)))
+#'   my.predictions(algos =list(get(implement$best)))
 
 
 getBestModel <- function(dates,values,freq,complete=0,n_test=NA,
@@ -81,14 +82,15 @@ getBestModel <- function(dates,values,freq,complete=0,n_test=NA,
 
   best <- names(errors)[apply(errors,which.min,MARGIN = 1)] %>% paste("my",.,sep=".")
 
+  ### Graph comparing actual values & algo predictions
+  ddd <- dplyr::filter(train,type %in% c(NA,"mean")) %>%
+    dplyr::select(-type) %>%
+    tidyr::gather(key="algo",value=val,-dates)
+  gg <- ggplot2::ggplot(ddd,aes(dates,val,color=algo)) + ggplot2::geom_line()
   if (graph==T)
   {
-    ddd <- dplyr::filter(train,type %in% c(NA,"mean")) %>%
-      dplyr::select(-type) %>%
-      tidyr::gather(key="algo",value=val,-dates)
-    gg <- ggplot2::ggplot(ddd,aes(dates,val,color=algo)) + ggplot2::geom_line()
     print(gg)
   }
 
-  return(best)
+  return(list(best=best,graph.train=gg,res.train=train))
 }
