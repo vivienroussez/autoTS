@@ -86,7 +86,7 @@ getBestModel <- function(dates,values,freq,complete=0,n_test=NA,
   ddd <- dplyr::filter(train,type %in% c(NA,"mean")) %>%
     dplyr::select(-type) %>%
     tidyr::gather(key="algo",value=val,-dates)
-  gg <- ggplot2::ggplot(ddd,aes(dates,val,color=algo)) + ggplot2::geom_line()
+  gg <- ggplot2::ggplot(ddd,ggplot2::aes(dates,val,color=algo)) + ggplot2::geom_line()
   if (graph==T)
   {
     print(gg)
