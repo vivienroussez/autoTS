@@ -2,7 +2,8 @@
 % Please edit documentation in R/algos.R
 \name{my.ets}
 \alias{my.ets}
-\title{Make a prediction with prophet algorithm for one year after last oberved point}
+\title{Make a prediction with ETS algorithm for one year after last oberved point
+TBATS differ from BATS in the way it models the seasonality}
 \usage{
 my.ets(prepedTS)
 }
@@ -13,5 +14,6 @@ my.ets(prepedTS)
 A dataframe with 4 columns : date, average prediction, upper and lower 95% confidence interval bounds
 }
 \description{
-Make a prediction with prophet algorithm for one year after last oberved point
+Make a prediction with ETS algorithm for one year after last oberved point
+TBATS differ from BATS in the way it models the seasonality
 }

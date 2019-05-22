@@ -15,7 +15,7 @@
 #' prepare.ts(dates = ts$date,values = ts$usage,freq = "month") %>%
 #'     my.predictions(func=list(my.ets,my.prophet))
 #'
-my.predictions <- function(prepedTS,algos=list(prophet=my.prophet,ets=my.ets, sarima=my.sarima,tbats=my.tbats,bats=my.bats))
+my.predictions <- function(prepedTS,algos=list(prophet=my.prophet,ets=my.ets, sarima=my.sarima,tbats=my.tbats,bats=my.bats,stlm=my.stlm))
 {
   ### Test frequency for ets (doesn't run for freq higher than 24...)
   where_ets <- grep("ets",names(algos))
@@ -66,7 +66,7 @@ my.predictions <- function(prepedTS,algos=list(prophet=my.prophet,ets=my.ets, sa
 
 
 getBestModel <- function(dates,values,freq,complete=0,n_test=NA,
-                         graph=T,algos=list(prophet=my.prophet,ets=my.ets, sarima=my.sarima,tbats=my.tbats,bats=my.bats))
+                         graph=T,algos=list(prophet=my.prophet,ets=my.ets, sarima=my.sarima,tbats=my.tbats,bats=my.bats,stlm=my.stlm))
 {
   freq.num <- getFrequency(freq)
 

@@ -122,7 +122,7 @@ my.tbats <- function(prepedTS)
 #' dates <- seq(as_date("2000-01-01"),as_date("2010-12-31"),"week")
 #' values <- rnorm(length(dates))
 #' my.ts <- prepare.ts(dates,values,"week",complete = 0)
-#' my.tbats(my.ts)
+#' my.bats(my.ts)
 #'
 
 my.bats <- function(prepedTS)
@@ -136,4 +136,27 @@ my.bats <- function(prepedTS)
   return(prev.bats)
 }
 
+#' Make a prediction with STLM algorithm for one year after last oberved point
+#'
+#' @param prepedTS A list created by the \code{prepare.ts()} function
+#' @return A dataframe with 4 columns : date, average prediction, upper and lower 95% confidence interval bounds
+#' @export
+#' @importFrom magrittr %>%
+#' @example library(lubridate)
+#' library(dplyr)
+#' dates <- seq(as_date("2000-01-01"),as_date("2010-12-31"),"week")
+#' values <- rnorm(length(dates))
+#' my.ts <- prepare.ts(dates,values,"week",complete = 0)
+#' my.stlm(my.ts)
+#'
 
+my.stlm <- function(prepedTS)
+{
+  prev.stlm <- forecast::stlm(prepedTS$obj.ts) %>%
+    forecast::forecast(h=prepedTS$freq.num)
+  dates <- time(prev.stlm$mean) %>% as.numeric() %>%
+    lubridate::date_decimal() %>% lubridate::round_date(prepedTS$freq.alpha)
+  prev.stlm <- data.frame(dates=lubridate::as_date(dates),prev.stlm.mean=as.numeric(prev.stlm$mean),
+                          prev.stlm.inf=as.numeric(prev.stlm$lower[,2]),prev.stlm.sup=as.numeric(prev.stlm$upper[,2]))
+  return(prev.stlm)
+}

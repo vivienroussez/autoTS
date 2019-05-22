@@ -1,10 +1,10 @@
-# Package autoTS
+# Package autoTS v0.2
 
 ## Introduction
 
-This R package is meant to provide a high-level interface to make **automated** predictions for **univariate** time series. The purpose is to avoid to deal with the different classes required by the different libraries (ts objects, data frames, matrices...) and to get fast results for large amount of time series.
+This R package is meant to provide a high-level interface to make **automated** predictions for **univariate** time series. The purpose is to avoid to deal with the different classes required by the different libraries (ts objects, data frames, matrices...) and to get fast results for large amount of time series. The results are return as dataframes.
 
-As of version 0.1, it is possible to deal with daily, weekly, monthly or quarterly time series.
+As of version 0.2, it is possible to deal with daily, weekly, monthly or quarterly time series.
 
 In order to be as generic as possible, the input required by this package is :
 
@@ -16,9 +16,13 @@ It implements the following algorithms (see below for details) :
 - SARIMA
 - Prophet
 - ETS (implements several exponential smoothing models)
+- BATS
+- TBATS
+- STL
 
 It provides a function `getbestModel` which trains every available algorithm, and compare the predictions of each of them on the last year (or n last observations) with the actual data (which is excluded from the training data).
 The function `my.predictions` provides automatic prediction for the selected algorithms one year ahead of the last know date.
+**Please note that ETS cannot handle time series of frequency higher than 24**
 
 ## Usage
 
@@ -77,3 +81,16 @@ The idea of this algorithm is to decompose (seasonality, trend,...) the time ser
 
 **Scalability** : this model is very fast to train
 
+### BATS and TBATS
+
+BATS stands for Box-Cox (transformation), ARIMA, Trend and Seasonality. The T of TBATS stands for Trigonometric (difference for seasonality model). Some insights about how the algorithm works can be found [here](https://medium.com/intive-developers/forecasting-time-series-with-multiple-seasonalities-using-tbats-in-python-398a00ac0e8a) (with python code)
+
+### Seasonal and Trend decomposition using Loess (STLM)
+
+STLM decomposes the time series in trend, seasonal and remainder. The forecast is obtained through :
+
+- Naive prediction of seasonal component 
+- Prediction with ARIMA or ETS for the seasonnaly adjusted series (trend + error)
+
+
+A good general presentation of all algorithms (except prophet) can be found on this [presentation](https://robjhyndman.com/files/2-AutomaticForecasting.pdf)

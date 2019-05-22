@@ -6,7 +6,7 @@
 in one final dataframe. If you want to save time, skip the sarima algorithm which is much slower}
 \usage{
 my.predictions(prepedTS, algos = list(prophet = my.prophet, ets = my.ets,
-  sarima = my.sarima))
+  sarima = my.sarima, tbats = my.tbats, bats = my.bats, stlm = my.stlm))
 }
 \arguments{
 \item{prepedTS}{A list created by the \code{prepare.ts()} function}
