@@ -31,7 +31,7 @@ getFrequency <- function(freq.alpha) ## get numerical frequency from alphanumeri
 #' @importFrom magrittr %>%
 #' @example library(lubridate)
 #' library(dplyr)
-#' dates <- seq(as_date("2000-01-01"),as_date("2010-12-31"),"quarter")
+#' dates <- seq(as_date("2000-01-01"),as_date("2010-12-31"),"month")
 #' values <- rnorm(length(dates))
 #' complete.ts(dates,values,"month",complete = 0)
 
@@ -78,7 +78,6 @@ prepare.ts <- function(dates,values,freq,complete=0) ### prepare object ready to
   ff <- getFrequency(freq)
   ts <- stats::ts(dd$val,start=lubridate::decimal_date(min(dd$date)),frequency=ff)
   return(list(obj.ts=ts,obj.df=dd,freq.num=ff,freq.alpha=freq))
-
 }
 
 

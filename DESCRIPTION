@@ -16,7 +16,8 @@ Imports:
     lubridate,
     tidyr,
     forecast,
-    ggplot2
+    ggplot2,
+    RcppRoll
 Depends:
     prophet
 RoxygenNote: 6.1.1

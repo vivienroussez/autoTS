@@ -10,13 +10,20 @@
 #' @importFrom magrittr %>%
 #' @example library(lubridate)
 #' library(dplyr)
-#' dates <- seq(as_date("2000-01-01"),as_date("2010-12-31"),"quarter")
+#' dates <- seq(as_date("2000-01-01"),as_date("2010-12-31"),"month")
 #' values <- rnorm(length(dates))
 #' prepare.ts(dates = ts$date,values = ts$usage,freq = "month") %>%
 #'     my.predictions(func=list(my.ets,my.prophet))
 #'
-my.predictions <- function(prepedTS,algos=list(prophet=my.prophet,ets=my.ets, sarima=my.sarima))
+my.predictions <- function(prepedTS,algos=list(prophet=my.prophet,ets=my.ets, sarima=my.sarima,tbats=my.tbats,bats=my.bats))
 {
+  ### Test frequency for ets (doesn't run for freq higher than 24...)
+  where_ets <- grep("ets",names(algos))
+  if (prepedTS$freq.num>24 & !is_empty(where_ets)) {
+    warning("Frequency too high to implement ETS ; skipping this algo")
+    algos <- algos[-where_ets]
+  }
+
   res <- lapply(algos,function(xx) xx(prepedTS)) %>%
     dplyr::bind_cols() %>%
     dplyr::select(dates, dplyr::starts_with("prev")) %>%
@@ -51,7 +58,7 @@ my.predictions <- function(prepedTS,algos=list(prophet=my.prophet,ets=my.ets, sa
 #' @example library(lubridate)
 #' library(dplyr)
 #' library(ggplot2)
-#' dates <- seq(as_date("2000-01-01"),as_date("2010-12-31"),"quarter")
+#' dates <- seq(as_date("2000-01-01"),as_date("2010-12-31"),"month")
 #' values <- rnorm(length(dates))
 #' implement <- getBestModel(dates,values,freq = "month",algos = list(my.sarima,my.ets))
 #' res <- prepare.ts(dates,values,freq = "month") %>%
@@ -59,24 +66,32 @@ my.predictions <- function(prepedTS,algos=list(prophet=my.prophet,ets=my.ets, sa
 
 
 getBestModel <- function(dates,values,freq,complete=0,n_test=NA,
-                         graph=T,algos=list(prophet=my.prophet,ets=my.ets, sarima=my.sarima))
+                         graph=T,algos=list(prophet=my.prophet,ets=my.ets, sarima=my.sarima,tbats=my.tbats,bats=my.bats))
 {
   freq.num <- getFrequency(freq)
+
   if (is.na(n_test)) n_test <- freq.num # by default, test over the last observed year
 
   df <- complete.ts(dates,values,freq,complete=0)
 
-  ## filter out the last year
+  ## filter out the last year and create proper object for algos
   fin <- df$dates[1:(length(df$dates)-n_test)] %>% max()
   df_filter <- dplyr::filter(df,dates<=fin)
 
-  train <- prepare.ts(df_filter$dates,df_filter$val,freq,complete) %>%
-    my.predictions(algos) %>%
+  prepedTS <- prepare.ts(df_filter$dates,df_filter$val,freq,complete)
+
+  ### Test frequency for ets (doesn't run for freq higher than 24...)
+  where_ets <- grep("ets",names(algos))
+  if (prepedTS$freq.num>24 & !is_empty(where_ets)) {
+    warning("Frequency too high to implement ETS ; skipping this algo")
+    algos <- algos[-where_ets]
+  }
+  train <- my.predictions(prepedTS,algos) %>%
     dplyr::select(-actual.value) %>%
-    full_join(df,by="dates") %>%
+    dplyr::full_join(df,by="dates") %>%
     dplyr::rename(actual.value=val)
 
-  errors <- dplyr::summarise_if(train,is.numeric,
+    errors <- dplyr::summarise_if(train,is.numeric,
                                 function(xx) sqrt(mean((xx-train$actual.value)^2,na.rm = T))) %>%
     dplyr::select(-actual.value)
 
