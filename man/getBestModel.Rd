@@ -8,7 +8,8 @@ If you want to save time, skip the SARIMA method.}
 \usage{
 getBestModel(dates, values, freq, complete = 0, n_test = NA,
   graph = T, algos = list(prophet = my.prophet, ets = my.ets, sarima =
-  my.sarima, tbats = my.tbats, bats = my.bats, stlm = my.stlm))
+  my.sarima, tbats = my.tbats, bats = my.bats, stlm = my.stlm, shortterm =
+  my.shortterm))
 }
 \arguments{
 \item{dates}{A vector of dates that can be parsed by lubridate}

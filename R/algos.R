@@ -160,3 +160,47 @@ my.stlm <- function(prepedTS)
                           prev.stlm.inf=as.numeric(prev.stlm$lower[,2]),prev.stlm.sup=as.numeric(prev.stlm$upper[,2]))
   return(prev.stlm)
 }
+
+
+#' Make a prediction only upon previous year data. The prediction is built with last known smoothed evolution, previous year's
+#' seasonal components and the last yearly cumulated value. No confidence interval is provided with this method
+#'
+#' @param prepedTS A list created by the \code{prepare.ts()} function
+#' @return A dataframe with 4 columns : date, average prediction, upper and lower 95% confidence interval bounds
+#' @export
+#' @importFrom magrittr %>%
+#' @example library(lubridate)
+#' library(dplyr)
+#' dates <- seq(as_date("2000-01-01"),as_date("2010-12-31"),"week")
+#' values <- rnorm(length(dates))
+#' my.ts <- prepare.ts(dates,values,"week",complete = 0)
+#' my.shortterm(my.ts)
+
+my.shortterm <- function(prepedTS,smooth_window=2)
+{
+  dat <- prepedTS$obj.df %>%
+    dplyr::mutate(an=lubridate::year(dates))
+  ## Compute season component
+  agg_years <-dplyr::group_by(dat,an) %>%
+    dplyr::summarise(usage_year=sum(val))
+
+  season <- dplyr::left_join(dat,agg_years,by="an") %>%
+    dplyr::mutate(season=val/usage_year,
+           season = ifelse( !(is.na(season) | is.nan(season)| is.infinite(season)),season,0)) %>%
+    dplyr::select(dates,val,season)
+
+  evols <- season %>%
+    dplyr::mutate(cum_year = RcppRoll::roll_sumr(val,round(prepedTS$freq.num),na.rm=T),
+              evol = RcppRoll::roll_sumr(val,smooth_window,na.rm=T) / dplyr::lag(RcppRoll::roll_sumr(val,smooth_window,na.rm=T),12),
+              evol = ifelse( !(is.na(evol) | is.nan(evol) | is.infinite(evol)),evol,0) ) %>%
+    dplyr::filter(dplyr::row_number()==dplyr::n()) %>%
+    dplyr::select(-dates,-season,-val)
+
+  calc <- season %>%
+    dplyr::filter(dates>max(dates)-lubridate::years(1)) %>%
+    base::cbind(evols) %>%
+    dplyr::mutate(prev.shortterm.mean = cum_year*evol*season,prev.shortterm.inf=NA,prev.shortterm.sup=NA,
+                  dates = dates+lubridate::years(1)) %>%
+    dplyr::select(dates,prev.shortterm.mean,prev.shortterm.inf,prev.shortterm.sup)
+  return(calc)
+}

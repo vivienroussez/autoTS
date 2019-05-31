@@ -4,7 +4,7 @@
 \alias{complete.ts}
 \title{Creates additional dates and values when NA where removed and the TS is not complete}
 \usage{
-\method{complete}{ts}(dates, values, freq, complete = 0)
+complete.ts(dates, values, freq, complete = 0)
 }
 \arguments{
 \item{dates}{A vector of dates that can be parsed by lubridate}
