@@ -2,14 +2,15 @@
 
 ## Introduction
 
-This R package is meant to provide a high-level interface to make **automated** predictions for **univariate** time series. The purpose is to avoid to deal with the different classes required by the different libraries (ts objects, data frames, matrices...) and to get fast results for large amount of time series. The results are return as dataframes.
+This R package is meant to provide a high-level interface to make **automated** predictions for **univariate** time series. The purpose is to avoid to deal with the different classes required by the different libraries (ts objects, data frames, matrices...) and to get fast results for large amount of time series. The final results are included in tidy dataframes.
 
 As of version 0.5, it is possible to deal with daily, weekly, monthly or quarterly time series.
 
-In order to be as generic as possible, the input required by this package is :
+In order to be as generic as possible, the inputs required by most functions of this package are :
 
 - a vector of dates, such that [lubridate](https://lubridate.tidyverse.org/) can parse it
 - a vector of the same size as the previous, contraining the values for each datetime
+- a character string indicating the frequency of the series
 
 It implements the following algorithms (see below for details) :
 
