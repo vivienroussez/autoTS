@@ -53,7 +53,7 @@ my.predictions <- function(prepedTS,
   {
     res$bagged <- dplyr::select(res,-dates,-type,-actual.value) %>%
       apply(MARGIN = 1,mean)
-    res <- select(res,dates,type,actual.value,bagged)
+    res <-  dplyr::select(res,dates,type,actual.value,bagged)
   }
   return(res)
 }

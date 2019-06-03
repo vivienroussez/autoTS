@@ -7,9 +7,8 @@
 If you want to save time, skip the SARIMA method.}
 \usage{
 getBestModel(dates, values, freq, complete = 0, n_test = NA,
-  graph = T, algos = list(prophet = my.prophet, ets = my.ets, sarima =
-  my.sarima, tbats = my.tbats, bats = my.bats, stlm = my.stlm, shortterm =
-  my.shortterm))
+  graph = T, algos = list("my.prophet", "my.ets", "my.sarima",
+  "my.tbats", "my.bats", "my.stlm", "my.shortterm"), bagged = T)
 }
 \arguments{
 \item{dates}{A vector of dates that can be parsed by lubridate}
@@ -25,6 +24,9 @@ getBestModel(dates, values, freq, complete = 0, n_test = NA,
 \item{graph}{A boolean, if TRUE, comparison of algorithms is plotted}
 
 \item{algos}{A list containing the algorithms to test}
+
+\item{bagged}{A boolean indicating weather a "bagged" estimator (simple average of all algorithm) should be computed.
+Using this option will overwrite the list of algorithms to implement them all}
 }
 \value{
 A list contraining a character string with the name of the best method,

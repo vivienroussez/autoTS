@@ -1,10 +1,10 @@
-# Package autoTS v0.2
+# Package autoTS v0.5
 
 ## Introduction
 
 This R package is meant to provide a high-level interface to make **automated** predictions for **univariate** time series. The purpose is to avoid to deal with the different classes required by the different libraries (ts objects, data frames, matrices...) and to get fast results for large amount of time series. The results are return as dataframes.
 
-As of version 0.2, it is possible to deal with daily, weekly, monthly or quarterly time series.
+As of version 0.5, it is possible to deal with daily, weekly, monthly or quarterly time series.
 
 In order to be as generic as possible, the input required by this package is :
 
@@ -19,10 +19,13 @@ It implements the following algorithms (see below for details) :
 - BATS
 - TBATS
 - STL
+- Custom formula that uses only previous year's data ("short term")
 
-It provides a function `getbestModel` which trains every available algorithm, and compare the predictions of each of them on the last year (or n last observations) with the actual data (which is excluded from the training data).
-The function `my.predictions` provides automatic prediction for the selected algorithms one year ahead of the last know date.
+It provides a function `getbestModel` which trains every available algorithm, and compares the predictions of each of them on the last observed year (or n last observations) with the actual data (which is excluded from the training data).
+The function `my.predictions` provides automatic prediction for the selected algorithms one year ahead of the last known date.
 **Please note that ETS cannot handle time series of frequency higher than 24**
+
+The `getbestModel` and `my.predictions` functions also allow the user to compute a **bagged** estimator, defined as the mean of all implemented algorithms
 
 ## Usage
 
@@ -33,13 +36,13 @@ library(autoTS)
 library(magrittr)
 
 ## Generate dummy data
-dates <- seq(lubridate::as_date("2000-01-01"),lubridate::as_date("2010-12-31"),"month")
+dates <- seq(lubridate::as_date("2005-01-01"),lubridate::as_date("2010-12-31"),"month")
 values <- 1:length(dates)/10 + rnorm(length(dates))
+
 ## Find best algo
-which.model <- getBestModel(dates,values,freq = "month",algos = list(my.sarima,my.ets,my.prophet))
-## Implement it on full sample
-res <- prepare.ts(dates,values,freq = "month") %>%
-  my.predictions(algos =list(get(which.model)))
+implement <- getBestModel(dates,values,freq = "month",bagged = T)
+res <- prepare.ts(dates,values,freq="month") %>%
+  my.predictions(implement$best)
 ```
 
 ## Warnings

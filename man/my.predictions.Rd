@@ -5,14 +5,17 @@
 \title{Make predictions with desired algorithms, combine them with observed data and gather everything
 in one final dataframe. If you want to save time, skip the sarima algorithm which is much slower}
 \usage{
-my.predictions(prepedTS, algos = list(prophet = my.prophet, ets = my.ets,
-  sarima = my.sarima, tbats = my.tbats, bats = my.bats, stlm = my.stlm,
-  shortterm = my.shortterm))
+my.predictions(prepedTS, algos = list("my.prophet", "my.ets",
+  "my.sarima", "my.tbats", "my.bats", "my.stlm", "my.shortterm"),
+  bagged = F)
 }
 \arguments{
 \item{prepedTS}{A list created by the \code{prepare.ts()} function}
 
 \item{algos}{A list containing the algorithms to be implemented}
+
+\item{bagged}{A boolean indicating weather a "bagged" estimator (simple average of all algorithm) should be computed.
+Using this option will overwrite the provided list of algorithms to implement them all}
 }
 \value{
 A dataframe containing : date, actual observed values, one column per used algorithm, and
