@@ -183,6 +183,7 @@ my.shortterm <- function(prepedTS,smooth_window=2)
   ## Compute season component
   agg_years <-dplyr::group_by(dat,an) %>%
     dplyr::summarise(usage_year=sum(val))
+  last_year <- agg_years$usage_year[nrow(agg_years)]
 
   season <- dplyr::left_join(dat,agg_years,by="an") %>%
     dplyr::mutate(season=val/usage_year,
@@ -191,7 +192,7 @@ my.shortterm <- function(prepedTS,smooth_window=2)
 
   evols <- season %>%
     dplyr::mutate(cum_year = RcppRoll::roll_sumr(val,round(prepedTS$freq.num),na.rm=T),
-              evol = RcppRoll::roll_sumr(val,smooth_window,na.rm=T) / dplyr::lag(RcppRoll::roll_sumr(val,smooth_window,na.rm=T),12),
+              evol = (RcppRoll::roll_sumr(val,smooth_window,na.rm=T) / dplyr::lag(RcppRoll::roll_sumr(val,smooth_window,na.rm=T),12))^(1/smooth_window),
               evol = ifelse( !(is.na(evol) | is.nan(evol) | is.infinite(evol)),evol,0) ) %>%
     dplyr::filter(dplyr::row_number()==dplyr::n()) %>%
     dplyr::select(-dates,-season,-val)
@@ -199,7 +200,7 @@ my.shortterm <- function(prepedTS,smooth_window=2)
   calc <- season %>%
     dplyr::filter(dates>max(dates)-lubridate::years(1)) %>%
     base::cbind(evols) %>%
-    dplyr::mutate(prev.shortterm.mean = cum_year*evol*season,prev.shortterm.inf=NA,prev.shortterm.sup=NA,
+    dplyr::mutate(prev.shortterm.mean = last_year*evol*season,prev.shortterm.inf=NA,prev.shortterm.sup=NA,
                   dates = dates+lubridate::years(1)) %>%
     dplyr::select(dates,prev.shortterm.mean,prev.shortterm.inf,prev.shortterm.sup)
   return(calc)

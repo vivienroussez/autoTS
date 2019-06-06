@@ -11,6 +11,7 @@ res <- prepare.ts(dates,values,freq = "month") %>%
 
 dates <- seq(lubridate::as_date("2005-01-01"),lubridate::as_date("2010-12-31"),"month")
 values <- 1:length(dates)/10 + rnorm(length(dates))
+toto <- prepare.ts(dates,values,"month")
 implement <- getBestModel(dates,values,freq = "month",bagged = T)
 res <- autoTS::prepare.ts(dates,values,freq="month") %>%
   my.predictions(implement$best)
