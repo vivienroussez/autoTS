@@ -192,7 +192,7 @@ my.shortterm <- function(prepedTS,smooth_window=2)
 
   evols <- season %>%
     dplyr::mutate(cum_year = RcppRoll::roll_sumr(val,round(prepedTS$freq.num),na.rm=T),
-              evol = (RcppRoll::roll_sumr(val,smooth_window,na.rm=T) / dplyr::lag(RcppRoll::roll_sumr(val,smooth_window,na.rm=T),12))^(1/smooth_window),
+              evol = RcppRoll::roll_sumr(val,smooth_window,na.rm=T) / dplyr::lag(RcppRoll::roll_sumr(val,smooth_window,na.rm=T),12),
               evol = ifelse( !(is.na(evol) | is.nan(evol) | is.infinite(evol)),evol,0) ) %>%
     dplyr::filter(dplyr::row_number()==dplyr::n()) %>%
     dplyr::select(-dates,-season,-val)
@@ -203,5 +203,6 @@ my.shortterm <- function(prepedTS,smooth_window=2)
     dplyr::mutate(prev.shortterm.mean = last_year*evol*season,prev.shortterm.inf=NA,prev.shortterm.sup=NA,
                   dates = dates+lubridate::years(1)) %>%
     dplyr::select(dates,prev.shortterm.mean,prev.shortterm.inf,prev.shortterm.sup)
+  calc <- calc[1:floor(prepedTS$freq.num),]
   return(calc)
 }

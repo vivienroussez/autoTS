@@ -9,27 +9,9 @@ which.model <- getBestModel(dates,values,freq = "month")
 res <- prepare.ts(dates,values,freq = "month") %>%
   my.predictions(algos = list(which.model$best))
 
-dates <- seq(lubridate::as_date("2005-01-01"),lubridate::as_date("2010-12-31"),"month")
-values <- 1:length(dates)/10 + rnorm(length(dates))
-toto <- prepare.ts(dates,values,"month")
-implement <- getBestModel(dates,values,freq = "month",bagged = T)
-res <- autoTS::prepare.ts(dates,values,freq="month") %>%
+dates <- seq(lubridate::as_date("2007-01-01"),lubridate::as_date("2010-12-31"),"week")
+values <- 1:length(dates)/100 + rnorm(length(dates))
+toto <- prepare.ts(dates,values,"week")
+implement <- getBestModel(dates,values,freq = "week",bagged = T)
+  res <- autoTS::prepare.ts(dates,values,freq="week") %>%
   my.predictions(implement$best)
-
-toto <- getBestModel(dates,values,freq = "month",bagged = T)
-plotly::ggplotly(toto$graph.train)
-
-res <- prepare.ts(dates,values,freq = "month") %>%
-  my.predictions(algos = list("my.bagged"))
-
-toto$res.train$bagged <- dplyr::select(toto$res.train,-dates,-type,-actual.value) %>%
-  apply(MARGIN = 1,mean)
-
-  my.stlm(prepedTS)
-
-
-dates <- seq(lubridate::as_date("2000-01-01"),lubridate::as_date("2010-12-31"),"month")
-values <- rnorm(length(dates))
-implement <- getBestModel(dates,values,freq = "month")
-res <- prepare.ts(dates,values,freq = "month") %>%
-  my.predictions(algos =list(implement$best))

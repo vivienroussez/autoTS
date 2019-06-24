@@ -36,7 +36,7 @@ my.predictions <- function(prepedTS,
 
   algos <- lapply(algos,get)
 
-  res <- lapply(algos,function(xx) xx(prepedTS)) %>%
+    res <- lapply(algos,function(xx) xx(prepedTS)) %>%
     dplyr::bind_cols() %>%
     dplyr::select(dates, dplyr::starts_with("prev")) %>%
     tidyr::gather(key="var",value = "val",-dates) %>%
