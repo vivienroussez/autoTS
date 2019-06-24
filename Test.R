@@ -13,5 +13,5 @@ dates <- seq(lubridate::as_date("2007-01-01"),lubridate::as_date("2010-12-31"),"
 values <- 1:length(dates)/100 + rnorm(length(dates))
 toto <- prepare.ts(dates,values,"week")
 implement <- getBestModel(dates,values,freq = "week",bagged = T)
-  res <- autoTS::prepare.ts(dates,values,freq="week") %>%
-  my.predictions(implement$best)
+res <- autoTS::prepare.ts(dates,values,freq="week") %>%
+  my.predictions(list("my.bagged"))

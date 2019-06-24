@@ -24,15 +24,15 @@ my.predictions <- function(prepedTS,
 
   if (!is_empty(grep("my.bagged",algos))) bagged <- T ## Check if best is bagged algo
 
+  ### Implementing all algorithms if bagged estimator is requested
+  if (bagged==T) algos <- list("my.prophet","my.ets", "my.sarima","my.tbats","my.bats","my.stlm","my.shortterm")
+
   ### Test frequency for ets (doesn't run for freq higher than 24...)
   where_ets <- grep("ets",algos)
   if (prepedTS$freq.num>24 & !is_empty(where_ets)) {
-    warning("Frequency too high to implement ETS ; skipping this algo")
+    warning("Frequency too high to implement ETS ; skipping this algorithm")
     algos <- algos[-where_ets]
   }
-
-  ### Implementing all algorithms if bagged estimator is requested
-  if (bagged==T) algos <- list("my.prophet","my.ets", "my.sarima","my.tbats","my.bats","my.stlm","my.shortterm")
 
   algos <- lapply(algos,get)
 
@@ -105,7 +105,7 @@ getBestModel <- function(dates,values,
   ### Test frequency for ets (doesn't run for freq higher than 24...)
   where_ets <- grep("ets",names(algos))
   if (prepedTS$freq.num>24 & !is_empty(where_ets)) {
-    warning("Frequency too high to implement ETS ; skipping this algo")
+    warning("Frequency too high to implement ETS ; skipping this algorithm")
     algos <- algos[-where_ets]
   }
 
