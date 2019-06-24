@@ -14,4 +14,4 @@ values <- 1:length(dates)/100 + rnorm(length(dates))
 toto <- prepare.ts(dates,values,"week")
 implement <- getBestModel(dates,values,freq = "week",bagged = T)
 res <- autoTS::prepare.ts(dates,values,freq="week") %>%
-  my.predictions(list("my.bagged"))
+  my.predictions("my.bagged")
