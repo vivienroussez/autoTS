@@ -48,7 +48,7 @@ head(dat)
 
 ## Data preparation
 
-First, we have to clean the data (not too ugly though). First thing is to convert the TIME column into a well known date format that lubridate can handle. In this example, `yq` function can parse the date without modification of the column. Then, we have to remove the blank in the values that separates thousands...
+First, we have to clean the data (not too ugly though). First thing is to convert the TIME column into a well known date format that lubridate can handle. In this example, the `yq` function can parse the date without modification of the column. Then, we have to remove the blank in the values that separates thousands...
 Finally, we only keep data since 2000 and the unadjusted series in current prices.
 
 After that, we should get one time series per country
@@ -56,7 +56,8 @@ After that, we should get one time series per country
 ```{r}
 dat <- mutate(dat,dates=yq(as.character(TIME)),
               values = as.numeric(stringr::str_remove(Value," "))) %>% 
-  filter(year(dates)>=2000 & S_ADJ=="Unadjusted data (i.e. neither seasonally adjusted nor calendar adjusted data)" &
+  filter(year(dates)>=2000 & 
+           S_ADJ=="Unadjusted data (i.e. neither seasonally adjusted nor calendar adjusted data)" &
            UNIT == "Current prices, million euro")
 
 filter(dat,GEO %in% c("France","Austria")) %>% 
