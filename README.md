@@ -1,10 +1,10 @@
-# Package autoTS v0.5
+# Package autoTS v0.7
 
 ## Introduction
 
 This R package is meant to provide a high-level interface to make **automated** predictions for **univariate** time series. The purpose is to avoid to deal with the different classes required by the different libraries (ts objects, data frames, matrices...) and to get fast results for large amount of time series. The final results are included in tidy dataframes.
 
-As of version 0.6, it is possible to deal with daily, weekly, monthly or quarterly time series.
+As of version 0.7, it is possible to deal with daily, weekly, monthly or quarterly time series.
 
 In order to be as generic as possible, the inputs required by most functions of this package are :
 
@@ -47,6 +47,12 @@ values <- 1:length(dates)/10 + rnorm(length(dates))
 implement <- getBestModel(dates,values,freq = "month",bagged = T)
 res <- prepare.ts(dates,values,freq="month") %>%
   my.predictions(implement$best)
+```
+
+You can use the **shiny user interface** to upload a csv file with you own time series to test the prediction interactively. This allows only one prediction at a time ; for bulk prediction, use the code and refer to the example notebook contained in the package.
+
+```{r}
+runUserInterface()
 ```
 
 ## Warnings
@@ -105,7 +111,7 @@ A good general presentation of all algorithms (except prophet) can be found on t
 
 ## Changelog
 
-### Version 0.6 :
+### Version 0.7 :
 
 - Added graphical interface with shiny app
 - bug fixes : 
