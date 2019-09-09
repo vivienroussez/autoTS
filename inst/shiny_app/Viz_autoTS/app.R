@@ -48,7 +48,9 @@ ui <- navbarPage("AutoTS graphical interface",
                                                          "STL"="my.stlm","Short term"="my.shortterm","Bagged estimator"="my.bagged",
                                                          "Best model"="best"),
                                           selected = "best"),
-                              numericInput("test_length","Number of obs for test data",value = 12)
+                              numericInput("test_length","Number of obs for test data",value = 12),
+                              numericInput("pred_ahead","Number of periods for prediction",value=12),
+                              downloadButton("downloadData", "Download predictions")
                             )
                      ),
                      column(8,
@@ -59,68 +61,76 @@ ui <- navbarPage("AutoTS graphical interface",
                             plotlyOutput("pred") %>%
                               shinycssloaders::withSpinner(color = "#ff0000")
                      )
-                     
+
                    )
                  )
-                 
+
 )
 
 
 # Define server logic required to draw a histogram
 server <- function(input, output) {
-  
+
   dat <- reactive({
     inFile <- input$file1
     if (is.null(inFile)) return(NULL)
     data <- read.csv(inFile$datapath, header = TRUE)
     return(data)
   })
-  
+
   output$select_date <- renderUI({
     selectInput("date","Date variable",names(dat()),selected = names(dat())[1])
   })
-  
+
   output$select_var <- renderUI({
     selectInput("var","Variable to predict",names(dat()),selected = names(dat())[2])
   })
-  
+
   train <- reactive({
     validate(need(!is.null(dat()),"Waiting for data"))
     getBestModel(dat()[,input$date],dat()[,input$var],freq = input$freq,graph = F,n_test = input$test_length)
   })
-  
+
   pred <- reactive({
     validate(need(!is.null(dat()),"Waiting for data"))
     data_ts <- prepare.ts(dat()[,input$date],dat()[,input$var],freq = input$freq)
-    if (input$model_choice=="best") res <- my.predictions(data_ts,train()$best)
-    else res <- my.predictions(data_ts,input$model_choice)
+    if (input$model_choice=="best") res <- my.predictions(data_ts,train()$best,n_pred = input$pred_ahead)
+    else res <- my.predictions(data_ts,input$model_choice,n_pred = input$pred_ahead)
     return(res)
   })
-  
+
   output$train <- renderPlotly({
     train()$graph.train + theme_light()
   })
-  
+
   output$pred <- renderPlotly({
     dd <- pred()
-    gather(dd,key="var",value = "val",-dates,-type) %>% 
-      mutate(type=ifelse(var=="actual.value","mean",type)) %>% 
-      filter(type=="mean") %>% 
+    gather(dd,key="var",value = "val",-dates,-type) %>%
+      mutate(type=ifelse(var=="actual.value","mean",type)) %>%
+      filter(type=="mean") %>%
       ggplot(aes(dates,val,color=var)) + geom_line() + theme_light()
   })
-  
+
   ### Global user instructions for the first panel
-  output$instructions <- renderText({  
-    readLines("Instructions.html")  
+  output$instructions <- renderText({
+    readLines("Instructions.html")
   })
-  
+
   output$ex_table <- renderDataTable({
     read.csv("Example.csv",sep=input$separator,dec=input$decimal) %>% as.data.frame()
   })
-  
+
+  output$downloadData <- downloadHandler(
+    filename = function() {
+      paste("Prediction", ".csv", sep = "")
+    },
+    content = function(file) {
+      write.csv(pred(), file, row.names = FALSE)
+    }
+  )
 }
 
 
-# Run the application 
+# Run the application
 shinyApp(ui = ui, server = server)
 

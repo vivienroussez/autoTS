@@ -111,20 +111,6 @@ getBestModel <- function(dates,values,
 
   prepedTS <- prepare.ts(df_filter$dates,df_filter$val,freq,complete)
 
-  ### Test frequency for ets (doesn't run for freq higher than 24...)
-  where_ets <- grep("ets",names(algos))
-  if (prepedTS$freq.num>24 & !is_empty(where_ets)) {
-    warning("Frequency too high to implement ETS ; skipping this algorithm")
-    algos <- algos[-where_ets]
-  }
-
-  # Removing short term for predictions further than 1 year
-  where_short <- grep("shortterm",algos)
-  if (n_pred>prepedTS$freq.num & !is_empty(where_short)) {
-    warning("Predictions too far for short term algorithm, which has been skipped")
-    algos <- algos[-where_short]
-  }
-
   if (bagged==T) algos <- list("my.prophet","my.ets", "my.sarima","my.tbats","my.bats","my.stlm","my.shortterm")
 
   train <- my.predictions(prepedTS,algos,n_pred = n_test) %>%
