@@ -17,7 +17,10 @@ Imports:
     tidyr,
     forecast,
     ggplot2,
-    RcppRoll
+    RcppRoll,
+    plotly,
+    shiny,
+    shinycssloaders
 Depends:
     prophet
 RoxygenNote: 6.1.1

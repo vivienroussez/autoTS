@@ -6,6 +6,7 @@
 #' @param algos A list containing the algorithms to be implemented
 #' @param bagged A boolean indicating weather a "bagged" estimator (simple average of all algorithm) should be computed.
 #' Using this option will overwrite the provided list of algorithms to implement them all
+#' @param n_pred Int number of periods to forecast forward (eg n_pred = 12 will lead to one year of prediction for monthly time series)
 #' @return A dataframe containing : date, actual observed values, one column per used algorithm, and
 #' a column indicating the type of measure (mean prediction, upper or lower bound of CI)
 #' @export
@@ -19,9 +20,10 @@
 #'
 my.predictions <- function(prepedTS,
                            algos=list("my.prophet","my.ets", "my.sarima","my.tbats","my.bats","my.stlm","my.shortterm"),
-                           bagged=F)
+                           bagged=F,n_pred=NA)
 {
 
+  if (is.na(n_pred)) n_pred <- prepedTS$freq.num
   if (!is_empty(grep("my.bagged",algos))) bagged <- T ## Check if best is bagged algo
 
   ### Implementing all algorithms if bagged estimator is requested
@@ -34,9 +36,16 @@ my.predictions <- function(prepedTS,
     algos <- algos[-where_ets]
   }
 
+  # Removing short term for predictions further than 1 year
+  where_short <- grep("shortterm",algos)
+  if (n_pred>prepedTS$freq.num & !is_empty(where_short)) {
+    warning("Predictions too far for short term algorithm, which has been skipped")
+    algos <- algos[-where_short]
+  }
+
   algos <- lapply(algos,get)
 
-    res <- lapply(algos,function(xx) xx(prepedTS)) %>%
+    res <- lapply(algos,function(xx) xx(prepedTS,n_pred)) %>%
     dplyr::bind_cols() %>%
     dplyr::select(dates, dplyr::starts_with("prev")) %>%
     tidyr::gather(key="var",value = "val",-dates) %>%
@@ -109,9 +118,16 @@ getBestModel <- function(dates,values,
     algos <- algos[-where_ets]
   }
 
+  # Removing short term for predictions further than 1 year
+  where_short <- grep("shortterm",algos)
+  if (n_pred>prepedTS$freq.num & !is_empty(where_short)) {
+    warning("Predictions too far for short term algorithm, which has been skipped")
+    algos <- algos[-where_short]
+  }
+
   if (bagged==T) algos <- list("my.prophet","my.ets", "my.sarima","my.tbats","my.bats","my.stlm","my.shortterm")
 
-  train <- my.predictions(prepedTS,algos) %>%
+  train <- my.predictions(prepedTS,algos,n_pred = n_test) %>%
     dplyr::select(-actual.value) %>%
     dplyr::full_join(df,by="dates") %>%
     dplyr::rename(actual.value=val)

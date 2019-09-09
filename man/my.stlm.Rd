@@ -4,10 +4,12 @@
 \alias{my.stlm}
 \title{Make a prediction with STLM algorithm for one year after last oberved point}
 \usage{
-my.stlm(prepedTS)
+my.stlm(prepedTS, n_pred)
 }
 \arguments{
 \item{prepedTS}{A list created by the \code{prepare.ts()} function}
+
+\item{n_pred}{Int number of periods to forecast forward (eg n_pred = 12 will lead to one year of prediction for monthly time series)}
 }
 \value{
 A dataframe with 4 columns : date, average prediction, upper and lower 95% confidence interval bounds

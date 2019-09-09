@@ -7,6 +7,7 @@
 #' Make a prediction with prophet algorithm for one year after last oberved point
 #'
 #' @param prepedTS A list created by the \code{prepare.ts()} function
+#' @param n_pred Int number of periods to forecast forward (eg n_pred = 12 will lead to one year of prediction for monthly time series)
 #' @return A dataframe for "next year" with 4 columns : date, average prediction, upper and lower 95% confidence interval bounds
 #' @export
 #' @importFrom magrittr %>%
@@ -17,12 +18,12 @@
 #' my.ts <- prepare.ts(dates,values,"month",complete = 0)
 #' my.prophet(my.ts)
 
-my.prophet <- function(prepedTS)
+my.prophet <- function(prepedTS,n_pred)
 {
   mod.prophet <- prepedTS$obj.df %>%
     dplyr::select(ds=dates,y=val) %>%
     prophet::prophet(weekly.seasonality = F,daily.seasonality = F,yearly.seasonality = T)
-  prev.prophet <- prophet::make_future_dataframe(mod.prophet,periods = prepedTS$freq.num,
+  prev.prophet <- prophet::make_future_dataframe(mod.prophet,periods = n_pred,
                                                  freq = prepedTS$freq.alpha) %>%
     predict(mod.prophet,.) %>%
     dplyr::mutate(dates=lubridate::as_date(ds)) %>%
@@ -36,6 +37,7 @@ my.prophet <- function(prepedTS)
 #' Make a prediction with SARIMA algorithm for one year after last oberved point
 #'
 #' @param prepedTS A list created by the \code{prepare.ts()} function
+#' @param n_pred Int number of periods to forecast forward (eg n_pred = 12 will lead to one year of prediction for monthly time series)
 #' @return A dataframe with 4 columns : date, average prediction, upper and lower 95% confidence interval bounds
 #' @export
 #' @importFrom magrittr %>%
@@ -46,10 +48,10 @@ my.prophet <- function(prepedTS)
 #' my.ts <- prepare.ts(dates,values,"month",complete = 0)
 #' my.sarima(my.ts)
 #'
-my.sarima <- function(prepedTS)
+my.sarima <- function(prepedTS,n_pred)
 {
   prev.arima <- forecast::auto.arima(prepedTS$obj.ts,seasonal = T,D = 1) %>%
-    forecast::forecast(h=prepedTS$freq.num)
+    forecast::forecast(h=n_pred)
   dates <- time(prev.arima$mean) %>% as.numeric() %>%
     lubridate::date_decimal() %>% lubridate::round_date(prepedTS$freq.alpha)
   prev.arima <- data.frame(dates=lubridate::as_date(dates),prev.sarima.mean=as.numeric(prev.arima$mean),
@@ -64,6 +66,7 @@ my.sarima <- function(prepedTS)
 #' TBATS differ from BATS in the way it models the seasonality
 #'
 #' @param prepedTS A list created by the \code{prepare.ts()} function
+#' @param n_pred Int number of periods to forecast forward (eg n_pred = 12 will lead to one year of prediction for monthly time series)
 #' @return A dataframe with 4 columns : date, average prediction, upper and lower 95% confidence interval bounds
 #' @export
 #' @importFrom magrittr %>%
@@ -75,10 +78,10 @@ my.sarima <- function(prepedTS)
 #' my.ets(my.ts)
 #'
 
-my.ets <- function(prepedTS)
+my.ets <- function(prepedTS,n_pred)
 {
   prev.ets <- forecast::ets(prepedTS$obj.ts) %>%
-    forecast::forecast(h=prepedTS$freq.num)
+    forecast::forecast(h=n_pred)
   dates <- time(prev.ets$mean) %>% as.numeric() %>%
     lubridate::date_decimal() %>% lubridate::round_date(prepedTS$freq.alpha)
   prev.ets <- data.frame(dates=lubridate::as_date(dates),prev.ets.mean=as.numeric(prev.ets$mean),
@@ -89,6 +92,7 @@ my.ets <- function(prepedTS)
 #' Make a prediction with TBATS algorithm for one year after last oberved point
 #'
 #' @param prepedTS A list created by the \code{prepare.ts()} function
+#' @param n_pred Int number of periods to forecast forward (eg n_pred = 12 will lead to one year of prediction for monthly time series)
 #' @return A dataframe with 4 columns : date, average prediction, upper and lower 95% confidence interval bounds
 #' @export
 #' @importFrom magrittr %>%
@@ -100,10 +104,10 @@ my.ets <- function(prepedTS)
 #' my.tbats(my.ts)
 #'
 
-my.tbats <- function(prepedTS)
+my.tbats <- function(prepedTS,n_pred)
 {
   prev.tbats <- forecast::tbats(prepedTS$obj.ts) %>%
-    forecast::forecast(h=prepedTS$freq.num)
+    forecast::forecast(h=n_pred)
   dates <- time(prev.tbats$mean) %>% as.numeric() %>%
     lubridate::date_decimal() %>% lubridate::round_date(prepedTS$freq.alpha)
   prev.tbats <- data.frame(dates=lubridate::as_date(dates),prev.tbats.mean=as.numeric(prev.tbats$mean),
@@ -114,6 +118,7 @@ my.tbats <- function(prepedTS)
 #' Make a prediction with BATS algorithm for one year after last oberved point
 #'
 #' @param prepedTS A list created by the \code{prepare.ts()} function
+#' @param n_pred Int number of periods to forecast forward (eg n_pred = 12 will lead to one year of prediction for monthly time series)
 #' @return A dataframe with 4 columns : date, average prediction, upper and lower 95% confidence interval bounds
 #' @export
 #' @importFrom magrittr %>%
@@ -125,10 +130,10 @@ my.tbats <- function(prepedTS)
 #' my.bats(my.ts)
 #'
 
-my.bats <- function(prepedTS)
+my.bats <- function(prepedTS,n_pred)
 {
   prev.bats <- forecast::bats(prepedTS$obj.ts) %>%
-    forecast::forecast(h=prepedTS$freq.num)
+    forecast::forecast(h=n_pred)
   dates <- time(prev.bats$mean) %>% as.numeric() %>%
     lubridate::date_decimal() %>% lubridate::round_date(prepedTS$freq.alpha)
   prev.bats <- data.frame(dates=lubridate::as_date(dates),prev.bats.mean=as.numeric(prev.bats$mean),
@@ -139,6 +144,7 @@ my.bats <- function(prepedTS)
 #' Make a prediction with STLM algorithm for one year after last oberved point
 #'
 #' @param prepedTS A list created by the \code{prepare.ts()} function
+#' @param n_pred Int number of periods to forecast forward (eg n_pred = 12 will lead to one year of prediction for monthly time series)
 #' @return A dataframe with 4 columns : date, average prediction, upper and lower 95% confidence interval bounds
 #' @export
 #' @importFrom magrittr %>%
@@ -150,10 +156,10 @@ my.bats <- function(prepedTS)
 #' my.stlm(my.ts)
 #'
 
-my.stlm <- function(prepedTS)
+my.stlm <- function(prepedTS,n_pred)
 {
   prev.stlm <- forecast::stlm(prepedTS$obj.ts) %>%
-    forecast::forecast(h=prepedTS$freq.num)
+    forecast::forecast(h=n_pred)
   dates <- time(prev.stlm$mean) %>% as.numeric() %>%
     lubridate::date_decimal() %>% lubridate::round_date(prepedTS$freq.alpha)
   prev.stlm <- data.frame(dates=lubridate::as_date(dates),prev.stlm.mean=as.numeric(prev.stlm$mean),
@@ -166,6 +172,8 @@ my.stlm <- function(prepedTS)
 #' seasonal components and the last yearly cumulated value. No confidence interval is provided with this method
 #'
 #' @param prepedTS A list created by the \code{prepare.ts()} function
+#' @param n_pred Int number of periods to forecast forward (eg n_pred = 12 will lead to one year of prediction for monthly time series).
+#' Note that this algorithm cannot predict further than one year
 #' @return A dataframe with 4 columns : date, average prediction, upper and lower 95% confidence interval bounds
 #' @export
 #' @importFrom magrittr %>%
@@ -176,14 +184,16 @@ my.stlm <- function(prepedTS)
 #' my.ts <- prepare.ts(dates,values,"week",complete = 0)
 #' my.shortterm(my.ts)
 
-my.shortterm <- function(prepedTS,smooth_window=2)
+my.shortterm <- function(prepedTS,n_pred,smooth_window=2)
 {
   dat <- prepedTS$obj.df %>%
     dplyr::mutate(an=lubridate::year(dates))
   ## Compute season component
   agg_years <-dplyr::group_by(dat,an) %>%
     dplyr::summarise(usage_year=sum(val))
-  last_year <- agg_years$usage_year[nrow(agg_years)]
+
+  year_cumulate <- mutate(dat,cum_year = RcppRoll::roll_sumr(val,12))
+  last_year <- year_cumulate$cum_year[nrow(year_cumulate)]
 
   season <- dplyr::left_join(dat,agg_years,by="an") %>%
     dplyr::mutate(season=val/usage_year,
@@ -203,6 +213,6 @@ my.shortterm <- function(prepedTS,smooth_window=2)
     dplyr::mutate(prev.shortterm.mean = last_year*evol*season,prev.shortterm.inf=NA,prev.shortterm.sup=NA,
                   dates = dates+lubridate::years(1)) %>%
     dplyr::select(dates,prev.shortterm.mean,prev.shortterm.inf,prev.shortterm.sup)
-  calc <- calc[1:floor(prepedTS$freq.num),]
+  calc <- calc[1:floor(n_pred),]
   return(calc)
 }

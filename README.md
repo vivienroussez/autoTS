@@ -4,7 +4,7 @@
 
 This R package is meant to provide a high-level interface to make **automated** predictions for **univariate** time series. The purpose is to avoid to deal with the different classes required by the different libraries (ts objects, data frames, matrices...) and to get fast results for large amount of time series. The final results are included in tidy dataframes.
 
-As of version 0.5, it is possible to deal with daily, weekly, monthly or quarterly time series.
+As of version 0.6, it is possible to deal with daily, weekly, monthly or quarterly time series.
 
 In order to be as generic as possible, the inputs required by most functions of this package are :
 
@@ -24,7 +24,10 @@ It implements the following algorithms (see below for details) :
 
 It provides a function `getbestModel` which trains every available algorithm, and compares the predictions of each of them on the last observed year (or n last observations) with the actual data (which is excluded from the training data).
 The function `my.predictions` provides automatic prediction for the selected algorithms one year ahead of the last known date.
-**Please note that ETS cannot handle time series of frequency higher than 24**
+Warnings :
+
+- Please note that ETS cannot handle time series of frequency higher than 24
+- Forecasting more than one year ahead will de facto exclude the "short term" algorithm
 
 The `getbestModel` and `my.predictions` functions also allow the user to compute a **bagged** estimator, defined as the mean of all implemented algorithms
 
@@ -77,7 +80,7 @@ The idea of this algorithm is to decompose (seasonality, trend,...) the time ser
 $$ X_t = g(t) + s(t) + h(t) + \epsilon(t) $$
 Where g is the trend, s the seasonal and h holiday (has to be provided by the user, which has not been done yet) components. These components are estimated using GAM models. The detailed paper can be found [there](https://peerj.com/preprints/3190/) 
 
-**Scalability** : faster than ARIMA but somewhat long to train
+**Scalability** : faster than ARIMA but somehow long to train
 
 ### Exponential smoothing (ETS)
 
@@ -98,3 +101,17 @@ STLM decomposes the time series in trend, seasonal and remainder. The forecast i
 
 
 A good general presentation of all algorithms (except prophet) can be found on this [presentation](https://robjhyndman.com/files/2-AutomaticForecasting.pdf)
+
+
+## Changelog
+
+### Version 0.6 :
+
+- Added graphical interface with shiny app
+- bug fixes : 
+    + fix bug for short term algorithm (wrong predictions if number of periods to forecast forward was different than one year ahead )
+    + avoid running short term algorithm if number of period to forecast > one year
+    
+### Version 0.5 :
+
+First stable version

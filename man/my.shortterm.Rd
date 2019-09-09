@@ -5,10 +5,13 @@
 \title{Make a prediction only upon previous year data. The prediction is built with last known smoothed evolution, previous year's
 seasonal components and the last yearly cumulated value. No confidence interval is provided with this method}
 \usage{
-my.shortterm(prepedTS, smooth_window = 2)
+my.shortterm(prepedTS, n_pred, smooth_window = 2)
 }
 \arguments{
 \item{prepedTS}{A list created by the \code{prepare.ts()} function}
+
+\item{n_pred}{Int number of periods to forecast forward (eg n_pred = 12 will lead to one year of prediction for monthly time series).
+Note that this algorithm cannot predict further than one year}
 }
 \value{
 A dataframe with 4 columns : date, average prediction, upper and lower 95% confidence interval bounds

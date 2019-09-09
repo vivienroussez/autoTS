@@ -7,7 +7,7 @@ in one final dataframe. If you want to save time, skip the sarima algorithm whic
 \usage{
 my.predictions(prepedTS, algos = list("my.prophet", "my.ets",
   "my.sarima", "my.tbats", "my.bats", "my.stlm", "my.shortterm"),
-  bagged = F)
+  bagged = F, n_pred = NA)
 }
 \arguments{
 \item{prepedTS}{A list created by the \code{prepare.ts()} function}
@@ -16,6 +16,8 @@ my.predictions(prepedTS, algos = list("my.prophet", "my.ets",
 
 \item{bagged}{A boolean indicating weather a "bagged" estimator (simple average of all algorithm) should be computed.
 Using this option will overwrite the provided list of algorithms to implement them all}
+
+\item{n_pred}{Int number of periods to forecast forward (eg n_pred = 12 will lead to one year of prediction for monthly time series)}
 }
 \value{
 A dataframe containing : date, actual observed values, one column per used algorithm, and
