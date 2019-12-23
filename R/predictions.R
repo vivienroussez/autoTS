@@ -23,7 +23,7 @@ my.predictions <- function(prepedTS,
                            bagged=F,n_pred=NA)
 {
 
-  if (is.na(n_pred)) n_pred <- prepedTS$freq.num
+  if (is.na(n_pred)) n_pred <- round(prepedTS$freq.num[1])
   if (!is_empty(grep("my.bagged",algos))) bagged <- T ## Check if best is bagged algo
 
   ### Implementing all algorithms if bagged estimator is requested
@@ -31,14 +31,14 @@ my.predictions <- function(prepedTS,
 
   ### Test frequency for ets (doesn't run for freq higher than 24...)
   where_ets <- grep("ets",algos)
-  if (prepedTS$freq.num>24 & !is_empty(where_ets)) {
+  if (prepedTS$freq.num[1]>24 & !is_empty(where_ets)) {
     warning("Frequency too high to implement ETS ; skipping this algorithm")
     algos <- algos[-where_ets]
   }
 
   # Removing short term for predictions further than 1 year
   where_short <- grep("shortterm",algos)
-  if (n_pred>prepedTS$freq.num & !is_empty(where_short)) {
+  if (n_pred>prepedTS$freq.num[1] & !is_empty(where_short)) {
     warning("Predictions too far for short term algorithm, which has been skipped")
     algos <- algos[-where_short]
   }
@@ -101,7 +101,7 @@ getBestModel <- function(dates,values,
 {
   freq.num <- getFrequency(freq)
 
-  if (is.na(n_test)) n_test <- freq.num # by default, test over the last observed year
+  if (is.na(n_test)) n_test <- freq.num[1] # by default, test over the last observed year
 
   df <- complete.ts(dates,values,freq,complete=0)
 
@@ -134,7 +134,7 @@ getBestModel <- function(dates,values,
   ddd <- dplyr::filter(train,type %in% c(NA,"mean")) %>%
     dplyr::select(-type) %>%
     tidyr::gather(key="algo",value=val,-dates)
-  gg <- ggplot2::ggplot(ddd,ggplot2::aes(dates,val,color=algo)) + ggplot2::geom_line()
+  gg <- ggplot2::ggplot(ddd,ggplot2::aes(dates,val,color=algo)) + ggplot2::geom_line() + ggplot2::theme_minimal()
   if (graph==T)
   {
     print(gg)

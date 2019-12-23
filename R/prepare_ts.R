@@ -14,7 +14,7 @@ getFrequency <- function(freq.alpha) ## get numerical frequency from alphanumeri
 {
   if (freq.alpha=="month") {
     ff=12} else if(freq.alpha=="day") {
-      ff=365.25 } else if(freq.alpha=="week") {
+      ff=c(365.25,7) } else if(freq.alpha=="week") { # 2 seasonalities for daily series (weekly, yearly)
         ff=365.25/7 } else if(freq.alpha=="quarter") {
           ff=4} else stop("freq.alpha not implemented")
   return(ff)
@@ -75,8 +75,14 @@ prepare.ts <- function(dates,values,freq,complete=0) ### prepare object ready to
   dd <- complete.ts(dates,values,freq,complete=0)
 
   # create a ts object for the forecast package out of this completed TS
+  # if daily time series : for short ones (less than 2 years), frequency is set to 7 (ignoring yearly seasonality)
+  # if greater, ts object is created with 2 seasonalities
   ff <- getFrequency(freq)
-  ts <- stats::ts(dd$val,start=lubridate::decimal_date(min(dd$date)),frequency=ff)
+  if (freq=="day" & length(dd$val)/365 <2) {
+    ts <- forecast::msts(dd$val,start=lubridate::decimal_date(min(dd$date)),seasonal.periods = ff,ts.frequency = ff[1])
+  } else {
+    ts <- forecast::msts(dd$val,start=lubridate::decimal_date(min(dd$date)),seasonal.periods = ff[1],ts.frequency = ff[1])
+  }
   return(list(obj.ts=ts,obj.df=dd,freq.num=ff,freq.alpha=freq))
 }
 

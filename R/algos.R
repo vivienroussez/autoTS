@@ -50,10 +50,14 @@ my.prophet <- function(prepedTS,n_pred)
 #'
 my.sarima <- function(prepedTS,n_pred)
 {
-  prev.arima <- forecast::auto.arima(prepedTS$obj.ts,seasonal = T,D = 1) %>%
+  if (prepedTS$freq.alpha=="day" & length(prepedTS$obj.ts)/365 <2){
+    prev.arima <- forecast::auto.arima(prepedTS$obj.ts,seasonal = F,D = 1) %>%
     forecast::forecast(h=n_pred)
-  dates <- time(prev.arima$mean) %>% as.numeric() %>%
-    lubridate::date_decimal() %>% lubridate::round_date(prepedTS$freq.alpha)
+  } else{
+    prev.arima <- forecast::auto.arima(prepedTS$obj.ts,seasonal = T,D = 1) %>%
+      forecast::forecast(h=n_pred)
+  }
+  dates <- seq(max(prepedTS$obj.df$dates),by=prepedTS$freq.alpha,length.out = n_pred+1)[-1]
   prev.arima <- data.frame(dates=lubridate::as_date(dates),prev.sarima.mean=as.numeric(prev.arima$mean),
                            prev.sarima.inf=as.numeric(prev.arima$lower[,2]),
                            prev.sarima.sup=as.numeric(prev.arima$upper[,2]))
@@ -82,8 +86,7 @@ my.ets <- function(prepedTS,n_pred)
 {
   prev.ets <- forecast::ets(prepedTS$obj.ts) %>%
     forecast::forecast(h=n_pred)
-  dates <- time(prev.ets$mean) %>% as.numeric() %>%
-    lubridate::date_decimal() %>% lubridate::round_date(prepedTS$freq.alpha)
+  dates <- seq(max(prepedTS$obj.df$dates),by=prepedTS$freq.alpha,length.out = n_pred+1)[-1]
   prev.ets <- data.frame(dates=lubridate::as_date(dates),prev.ets.mean=as.numeric(prev.ets$mean),
                          prev.ets.inf=as.numeric(prev.ets$lower[,2]),prev.ets.sup=as.numeric(prev.ets$upper[,2]))
   return(prev.ets)
@@ -108,8 +111,7 @@ my.tbats <- function(prepedTS,n_pred)
 {
   prev.tbats <- forecast::tbats(prepedTS$obj.ts) %>%
     forecast::forecast(h=n_pred)
-  dates <- time(prev.tbats$mean) %>% as.numeric() %>%
-    lubridate::date_decimal() %>% lubridate::round_date(prepedTS$freq.alpha)
+  dates <- seq(max(prepedTS$obj.df$dates),by=prepedTS$freq.alpha,length.out = n_pred+1)[-1]
   prev.tbats <- data.frame(dates=lubridate::as_date(dates),prev.tbats.mean=as.numeric(prev.tbats$mean),
                            prev.tbats.inf=as.numeric(prev.tbats$lower[,2]),prev.tbats.sup=as.numeric(prev.tbats$upper[,2]))
   return(prev.tbats)
@@ -132,10 +134,15 @@ my.tbats <- function(prepedTS,n_pred)
 
 my.bats <- function(prepedTS,n_pred)
 {
-  prev.bats <- forecast::bats(prepedTS$obj.ts) %>%
+  if (prepedTS$freq.alpha=="day" & length(prepedTS$obj.ts)/365 <2){
+    prev.bats <- forecast::bats(prepedTS$obj.ts,seasonal.periods = prepedTS$freq.num[2]) %>%
     forecast::forecast(h=n_pred)
-  dates <- time(prev.bats$mean) %>% as.numeric() %>%
-    lubridate::date_decimal() %>% lubridate::round_date(prepedTS$freq.alpha)
+  } else{
+    prev.bats <- forecast::bats(prepedTS$obj.ts,seasonal.periods = prepedTS$freq.num) %>%
+      forecast::forecast(h=n_pred)
+  }
+
+  dates <- seq(max(prepedTS$obj.df$dates),by=prepedTS$freq.alpha,length.out = n_pred+1)[-1]
   prev.bats <- data.frame(dates=lubridate::as_date(dates),prev.bats.mean=as.numeric(prev.bats$mean),
                           prev.bats.inf=as.numeric(prev.bats$lower[,2]),prev.bats.sup=as.numeric(prev.bats$upper[,2]))
   return(prev.bats)
@@ -160,8 +167,7 @@ my.stlm <- function(prepedTS,n_pred)
 {
   prev.stlm <- forecast::stlm(prepedTS$obj.ts) %>%
     forecast::forecast(h=n_pred)
-  dates <- time(prev.stlm$mean) %>% as.numeric() %>%
-    lubridate::date_decimal() %>% lubridate::round_date(prepedTS$freq.alpha)
+  dates <- seq(max(prepedTS$obj.df$dates),by=prepedTS$freq.alpha,length.out = n_pred+1)[-1]
   prev.stlm <- data.frame(dates=lubridate::as_date(dates),prev.stlm.mean=as.numeric(prev.stlm$mean),
                           prev.stlm.inf=as.numeric(prev.stlm$lower[,2]),prev.stlm.sup=as.numeric(prev.stlm$upper[,2]))
   return(prev.stlm)
@@ -186,23 +192,24 @@ my.stlm <- function(prepedTS,n_pred)
 
 my.shortterm <- function(prepedTS,n_pred,smooth_window=2)
 {
+  season_comp <- round(min(prepedTS$freq.num))
   dat <- prepedTS$obj.df %>%
-    dplyr::mutate(an=lubridate::year(dates))
-  ## Compute season component
-  agg_years <-dplyr::group_by(dat,an) %>%
+    dplyr::mutate(fake_year = floor((dplyr::row_number())/min(prepedTS$freq.num))) ## create variable for aggregation for specific periodicity
+  ## Compute "season" component
+  agg_years <-dplyr::group_by(dat,fake_year) %>%
     dplyr::summarise(usage_year=sum(val))
 
-  year_cumulate <- mutate(dat,cum_year = RcppRoll::roll_sumr(val,12))
+  year_cumulate <- dplyr::mutate(dat,cum_year = RcppRoll::roll_sumr(val,season_comp))
   last_year <- year_cumulate$cum_year[nrow(year_cumulate)]
 
-  season <- dplyr::left_join(dat,agg_years,by="an") %>%
+  season <- dplyr::left_join(dat,agg_years,by="fake_year") %>%
     dplyr::mutate(season=val/usage_year,
            season = ifelse( !(is.na(season) | is.nan(season)| is.infinite(season)),season,0)) %>%
     dplyr::select(dates,val,season)
 
   evols <- season %>%
-    dplyr::mutate(cum_year = RcppRoll::roll_sumr(val,round(prepedTS$freq.num),na.rm=T),
-              evol = RcppRoll::roll_sumr(val,smooth_window,na.rm=T) / dplyr::lag(RcppRoll::roll_sumr(val,smooth_window,na.rm=T),12),
+    dplyr::mutate(cum_year = RcppRoll::roll_sumr(val,season_comp,na.rm=T),
+              evol = RcppRoll::roll_sumr(val,smooth_window,na.rm=T) / dplyr::lag(RcppRoll::roll_sumr(val,smooth_window,na.rm=T),season_comp),
               evol = ifelse( !(is.na(evol) | is.nan(evol) | is.infinite(evol)),evol,0) ) %>%
     dplyr::filter(dplyr::row_number()==dplyr::n()) %>%
     dplyr::select(-dates,-season,-val)
@@ -213,6 +220,8 @@ my.shortterm <- function(prepedTS,n_pred,smooth_window=2)
     dplyr::mutate(prev.shortterm.mean = last_year*evol*season,prev.shortterm.inf=NA,prev.shortterm.sup=NA,
                   dates = dates+lubridate::years(1)) %>%
     dplyr::select(dates,prev.shortterm.mean,prev.shortterm.inf,prev.shortterm.sup)
+
   calc <- calc[1:floor(n_pred),]
+  calc$dates <- seq(max(prepedTS$obj.df$dates),by=prepedTS$freq.alpha,length.out = n_pred+1)[-1]
   return(calc)
 }
