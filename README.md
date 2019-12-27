@@ -1,4 +1,4 @@
-# Package autoTS v0.7
+# Package autoTS v0.8
 
 ## Introduction
 
@@ -114,7 +114,7 @@ A good general presentation of all algorithms (except prophet) can be found on t
 ### Version 0.8 :
 
 - Handles daily and weekly series better
-- For forecast algorithms : switch from stats::ts objects to forecast::msts (multiple seasonalities)
+- For forecast algorithms : switched from stats::ts objects to forecast::msts (multiple seasonalities)
 - SCripts adapt for daily series : if less than one year, seasonality/frequency is set to 7 (for msts) ; if longer, seasonality is set to c(365.25,7)
 - Theme change for training graphic
 ### Version 0.7 :
