@@ -4,7 +4,7 @@
 
 This R package is meant to provide a high-level interface to make **automated** predictions for **univariate** time series. The purpose is to avoid to deal with the different classes required by the different libraries (ts objects, data frames, matrices...) and to get fast results for large amount of time series. The final results are included in tidy dataframes.
 
-As of version 0.7, it is possible to deal with daily, weekly, monthly or quarterly time series.
+As of version 0.8, it is possible to deal with daily, weekly, monthly or quarterly time series.
 
 In order to be as generic as possible, the inputs required by most functions of this package are :
 
@@ -111,6 +111,12 @@ A good general presentation of all algorithms (except prophet) can be found on t
 
 ## Changelog
 
+### Version 0.8 :
+
+- Handles daily and weekly series better
+- For forecast algorithms : switch from stats::ts objects to forecast::msts (multiple seasonalities)
+- SCripts adapt for daily series : if less than one year, seasonality/frequency is set to 7 (for msts) ; if longer, seasonality is set to c(365.25,7)
+- Theme change for training graphic
 ### Version 0.7 :
 
 - Added graphical interface with shiny app
