@@ -50,13 +50,8 @@ my.prophet <- function(prepedTS,n_pred)
 #'
 my.sarima <- function(prepedTS,n_pred)
 {
-  if (prepedTS$freq.alpha=="day" & length(prepedTS$obj.ts)/365 <2){
-    prev.arima <- forecast::auto.arima(prepedTS$obj.ts,seasonal = F,D = 1) %>%
+  prev.arima <- forecast::auto.arima(prepedTS$obj.ts,seasonal = T,D=1) %>%
     forecast::forecast(h=n_pred)
-  } else{
-    prev.arima <- forecast::auto.arima(prepedTS$obj.ts,seasonal = T,D = 1) %>%
-      forecast::forecast(h=n_pred)
-  }
   dates <- seq(max(prepedTS$obj.df$dates),by=prepedTS$freq.alpha,length.out = n_pred+1)[-1]
   prev.arima <- data.frame(dates=lubridate::as_date(dates),prev.sarima.mean=as.numeric(prev.arima$mean),
                            prev.sarima.inf=as.numeric(prev.arima$lower[,2]),
@@ -134,13 +129,8 @@ my.tbats <- function(prepedTS,n_pred)
 
 my.bats <- function(prepedTS,n_pred)
 {
-  if (prepedTS$freq.alpha=="day" & length(prepedTS$obj.ts)/365 <2){
-    prev.bats <- forecast::bats(prepedTS$obj.ts,seasonal.periods = prepedTS$freq.num[2]) %>%
-    forecast::forecast(h=n_pred)
-  } else{
     prev.bats <- forecast::bats(prepedTS$obj.ts,seasonal.periods = prepedTS$freq.num) %>%
       forecast::forecast(h=n_pred)
-  }
 
   dates <- seq(max(prepedTS$obj.df$dates),by=prepedTS$freq.alpha,length.out = n_pred+1)[-1]
   prev.bats <- data.frame(dates=lubridate::as_date(dates),prev.bats.mean=as.numeric(prev.bats$mean),
@@ -204,13 +194,13 @@ my.shortterm <- function(prepedTS,n_pred,smooth_window=2)
 
   season <- dplyr::left_join(dat,agg_years,by="fake_year") %>%
     dplyr::mutate(season=val/usage_year,
-           season = ifelse( !(is.na(season) | is.nan(season)| is.infinite(season)),season,0)) %>%
+                  season = ifelse( !(is.na(season) | is.nan(season)| is.infinite(season)),season,0)) %>%
     dplyr::select(dates,val,season)
 
   evols <- season %>%
     dplyr::mutate(cum_year = RcppRoll::roll_sumr(val,season_comp,na.rm=T),
-              evol = RcppRoll::roll_sumr(val,smooth_window,na.rm=T) / dplyr::lag(RcppRoll::roll_sumr(val,smooth_window,na.rm=T),season_comp),
-              evol = ifelse( !(is.na(evol) | is.nan(evol) | is.infinite(evol)),evol,0) ) %>%
+                  evol = RcppRoll::roll_sumr(val,smooth_window,na.rm=T) / dplyr::lag(RcppRoll::roll_sumr(val,smooth_window,na.rm=T),season_comp),
+                  evol = ifelse( !(is.na(evol) | is.nan(evol) | is.infinite(evol)),evol,0) ) %>%
     dplyr::filter(dplyr::row_number()==dplyr::n()) %>%
     dplyr::select(-dates,-season,-val)
 

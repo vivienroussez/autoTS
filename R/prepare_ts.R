@@ -78,11 +78,8 @@ prepare.ts <- function(dates,values,freq,complete=0) ### prepare object ready to
   # if daily time series : for short ones (less than 2 years), frequency is set to 7 (ignoring yearly seasonality)
   # if greater, ts object is created with 2 seasonalities
   ff <- getFrequency(freq)
-  if (freq=="day" & length(dd$val)/365 <2) {
-    ts <- forecast::msts(dd$val,start=lubridate::decimal_date(min(dd$date)),seasonal.periods = ff,ts.frequency = ff[1])
-  } else {
-    ts <- forecast::msts(dd$val,start=lubridate::decimal_date(min(dd$date)),seasonal.periods = ff[1],ts.frequency = ff[1])
-  }
+  if (freq=="day" & length(dd$val)/365 <2)  ff <- 7
+  ts <- forecast::msts(dd$val,start=lubridate::decimal_date(min(dd$date)),seasonal.periods = ff,ts.frequency = max(ff))
   return(list(obj.ts=ts,obj.df=dd,freq.num=ff,freq.alpha=freq))
 }
 

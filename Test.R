@@ -23,4 +23,13 @@ my.shortterm(prepedTS,n_pred = 14)
 
 dates <- seq(lubridate::as_date("2010-06-01"),lubridate::as_date("2010-12-31"),"day")
 values <- 10+ 1:length(dates)/100 + rnorm(length(dates))
+toto <- prepare.ts(dates,values,"day")
 toto <- getBestModel(dates,values,freq = "day",bagged = T,n_test = 15)
+
+my.sarima(toto,14)
+my.bats(toto,14)
+
+forecast::auto.arima(toto$obj.ts,seasonal = T) %>% forecast::forecast(10) %>% plot()
+
+prepedTS <- toto
+n_pred <- 10
