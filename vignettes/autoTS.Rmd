@@ -1,13 +1,16 @@
 ---
-title: "Package autoTS : automatic model selection <br> for univariate time series prediction"
-output:
-  html_notebook:
-    toc: true
-    toc_float: true
+title: "Introduction to autoTS"
+output: 
+  rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Introduction to autoTS}
+  %\VignetteEngine{knitr::rmarkdown}
+  \usepackage[utf8]{inputenc}
 ---
 
+
 ```{r}
-knitr::opts_chunk$set(warning = F,message = F)
+knitr::opts_chunk$set(warning = F,message = F,fig.width = 8,fig.height = 5)
 suppressPackageStartupMessages(library(dplyr))
 suppressPackageStartupMessages(library(ggplot2))
 suppressPackageStartupMessages(library(lubridate))
@@ -89,7 +92,7 @@ ggplot(preparedTS$obj.df,aes(dates,val)) + geom_line() + theme_light()
 best.algo <- getBestModel(ex1$dates,ex1$values,"quarter",bagged = T,graph = F)
 names(best.algo)
 print(paste("The best algorithm is",best.algo$best))
-plotly::ggplotly(best.algo$graph.train)
+best.algo$graph.train
 
 ## Build the predictions
 final.pred <- my.predictions(preparedTS,best.algo$best)
@@ -122,7 +125,7 @@ library(doParallel)
 pipeline <- function(dates,values)
 {
   bm <- getBestModel(dates,values,"quarter",graph = F)
-  pred <- prepare.ts(dates,values,"quarter") %>% 
+  pred <- prepare.ts(dates,values,"quarter") %>%
     my.predictions(bm$best)
   return(pred)
 }

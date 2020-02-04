@@ -12,6 +12,8 @@ my.shortterm(prepedTS, n_pred, smooth_window = 2)
 
 \item{n_pred}{Int number of periods to forecast forward (eg n_pred = 12 will lead to one year of prediction for monthly time series).
 Note that this algorithm cannot predict further than one year}
+
+\item{smooth_window}{Int specifying the number of periods to consider for computing the evolution rate that will be applied for the forecast}
 }
 \value{
 A dataframe with 4 columns : date, average prediction, upper and lower 95% confidence interval bounds

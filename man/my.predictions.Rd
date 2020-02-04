@@ -5,9 +5,13 @@
 \title{Make predictions with desired algorithms, combine them with observed data and gather everything
 in one final dataframe. If you want to save time, skip the sarima algorithm which is much slower}
 \usage{
-my.predictions(prepedTS, algos = list("my.prophet", "my.ets",
-  "my.sarima", "my.tbats", "my.bats", "my.stlm", "my.shortterm"),
-  bagged = F, n_pred = NA)
+my.predictions(
+  prepedTS,
+  algos = list("my.prophet", "my.ets", "my.sarima", "my.tbats", "my.bats", "my.stlm",
+    "my.shortterm"),
+  bagged = F,
+  n_pred = NA
+)
 }
 \arguments{
 \item{prepedTS}{A list created by the \code{prepare.ts()} function}

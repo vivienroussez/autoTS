@@ -1,12 +1,12 @@
 Package: autoTS
 Type: Package
 Title: Easily predict univariate time series
-Version: 0.7.0
+Version: 0.8.0
 Author: Vivien Roussez
 Maintainer: Vivien Roussez <vivien.roussez@gmail.com>
 Description: This packages provides a set of functions that
     helps to model and make predictions for univariate time series.
-License: What license is it under?
+License: GPL-3
 Encoding: UTF-8
 LazyData: true
 Imports:
@@ -23,4 +23,6 @@ Imports:
     shinycssloaders
 Depends:
     prophet
-RoxygenNote: 6.1.1
+Suggests: knitr, rmarkdown,stringr,doMC,doParallel
+VignetteBuilder: knitr
+RoxygenNote: 7.0.2

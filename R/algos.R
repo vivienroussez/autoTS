@@ -20,9 +20,10 @@
 
 my.prophet <- function(prepedTS,n_pred)
 {
+  if (prepedTS$freq.alpha=="day"){ws=T;ds=F;ys=T} else{ws=F;ds=F;ys=T}
   mod.prophet <- prepedTS$obj.df %>%
     dplyr::select(ds=dates,y=val) %>%
-    prophet::prophet(weekly.seasonality = F,daily.seasonality = F,yearly.seasonality = T)
+    prophet::prophet(weekly.seasonality = ws,daily.seasonality = ds,yearly.seasonality = ys)
   prev.prophet <- prophet::make_future_dataframe(mod.prophet,periods = n_pred,
                                                  freq = prepedTS$freq.alpha) %>%
     predict(mod.prophet,.) %>%
@@ -170,6 +171,7 @@ my.stlm <- function(prepedTS,n_pred)
 #' @param prepedTS A list created by the \code{prepare.ts()} function
 #' @param n_pred Int number of periods to forecast forward (eg n_pred = 12 will lead to one year of prediction for monthly time series).
 #' Note that this algorithm cannot predict further than one year
+#' @param smooth_window Int specifying the number of periods to consider for computing the evolution rate that will be applied for the forecast
 #' @return A dataframe with 4 columns : date, average prediction, upper and lower 95% confidence interval bounds
 #' @export
 #' @importFrom magrittr %>%

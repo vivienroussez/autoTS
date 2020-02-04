@@ -6,9 +6,17 @@
 (or n_test number of points), make a prediction, and returns the best performing algorithm on this period.
 If you want to save time, skip the SARIMA method.}
 \usage{
-getBestModel(dates, values, freq, complete = 0, n_test = NA,
-  graph = T, algos = list("my.prophet", "my.ets", "my.sarima",
-  "my.tbats", "my.bats", "my.stlm", "my.shortterm"), bagged = T)
+getBestModel(
+  dates,
+  values,
+  freq,
+  complete = 0,
+  n_test = NA,
+  graph = T,
+  algos = list("my.prophet", "my.ets", "my.sarima", "my.tbats", "my.bats", "my.stlm",
+    "my.shortterm"),
+  bagged = T
+)
 }
 \arguments{
 \item{dates}{A vector of dates that can be parsed by lubridate}

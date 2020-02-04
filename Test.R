@@ -1,8 +1,10 @@
 library(autoTS)
 library(magrittr)
 
-dates <- seq(lubridate::as_date("2000-01-01"),lubridate::as_date("2010-12-31"),"month")
+dates <- seq(lubridate::as_date("2007-01-01"),lubridate::as_date("2010-12-31"),"day")
 values <- 10+ 1:length(dates)/10 + rnorm(length(dates))
+# prepare.ts(dates,values,"day") %>% my.prophet(n_pred=12)
+
 ## Find best algo
 which.model <- getBestModel(dates,values,freq = "month",n_test = 24)
 ## Implement it on full sample
