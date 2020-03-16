@@ -24,21 +24,21 @@ my.predictions <- function(prepedTS,
 {
 
   if (is.na(n_pred)) n_pred <- round(prepedTS$freq.num[1])
-  if (!is_empty(grep("my.bagged",algos))) bagged <- T ## Check if best is bagged algo
+  if (!rlang::is_empty(grep("my.bagged",algos))) bagged <- T ## Check if best is bagged algo
 
   ### Implementing all algorithms if bagged estimator is requested
   if (bagged==T) algos <- list("my.prophet","my.ets", "my.sarima","my.tbats","my.bats","my.stlm","my.shortterm")
 
   ### Test frequency for ets (doesn't run for freq higher than 24...)
   where_ets <- grep("ets",algos)
-  if (prepedTS$freq.num[1]>24 & !is_empty(where_ets)) {
+  if (prepedTS$freq.num[1]>24 & !rlang::is_empty(where_ets)) {
     warning("Frequency too high to implement ETS ; skipping this algorithm")
     algos <- algos[-where_ets]
   }
 
   # Removing short term for predictions further than 1 year
   where_short <- grep("shortterm",algos)
-  if (n_pred>prepedTS$freq.num[1] & !is_empty(where_short)) {
+  if (n_pred>prepedTS$freq.num[1] & !rlang::is_empty(where_short)) {
     warning("Predictions too far for short term algorithm, which has been skipped")
     algos <- algos[-where_short]
   }
@@ -122,9 +122,12 @@ getBestModel <- function(dates,values,
   {
     train$bagged <- dplyr::select(train,-dates,-type,-actual.value) %>%
       apply(MARGIN = 1,mean)
+    train$bagged.noshortterm <- dplyr::select(train,-dates,-type,-actual.value,-shortterm,-bagged) %>%
+      apply(MARGIN = 1,mean)
   }
 
-  errors <- dplyr::summarise_if(train,is.numeric,
+  errors <- dplyr::filter(train,type=="mean") %>%
+    dplyr::summarise_if(is.numeric,
                                 function(xx) sqrt(mean((xx-train$actual.value)^2,na.rm = T))) %>%
     dplyr::select(-actual.value)
 
@@ -140,5 +143,5 @@ getBestModel <- function(dates,values,
     print(gg)
   }
 
-  return(list(best=best,graph.train=gg,res.train=train))
+  return(list(best=best,train.errors=errors,graph.train=gg,res.train=train))
 }

@@ -1,12 +1,12 @@
 library(autoTS)
 library(magrittr)
 
-dates <- seq(lubridate::as_date("2007-01-01"),lubridate::as_date("2010-12-31"),"day")
+dates <- seq(lubridate::as_date("2007-01-01"),lubridate::as_date("2010-12-31"),"month")
 values <- 10+ 1:length(dates)/10 + rnorm(length(dates))
 # prepare.ts(dates,values,"day") %>% my.prophet(n_pred=12)
 
 ## Find best algo
-which.model <- getBestModel(dates,values,freq = "month",n_test = 24)
+which.model <- getBestModel(dates,values,freq = "month",n_test = 6)
 ## Implement it on full sample
 res <- prepare.ts(dates,values,freq = "month") %>%
   my.predictions(algos = list(which.model$best),n_pred = 14)
