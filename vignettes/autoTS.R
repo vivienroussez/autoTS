@@ -31,16 +31,16 @@ plot.ts(preparedTS$obj.ts)
 ggplot(preparedTS$obj.df,aes(dates,val)) + geom_line() + theme_light()
 
 ## What is the best model for prediction ?
-best.algo <- getBestModel(ex1$dates,ex1$values,"quarter",bagged = T,graph = F)
+best.algo <- getBestModel(ex1$dates,ex1$values,"quarter",graph = F)
 names(best.algo)
 print(paste("The best algorithm is",best.algo$best))
 best.algo$graph.train
 
 ## Build the predictions
-final.pred <- my.predictions(preparedTS,best.algo$best)
+final.pred <- my.predictions(bestmod = best.algo)
 tail(final.pred,24)
 ggplot(final.pred) + geom_line(aes(dates,actual.value),color="black") + 
-  geom_line(aes(dates,prophet,linetype=type),color="red") +
+  geom_line(aes_string("dates",stringr::str_remove(best.algo$best,"my."),linetype="type"),color="red") +
   theme_light() 
 
 ## -----------------------------------------------------------------------------
@@ -54,9 +54,8 @@ head(dat.wide)
 library(doParallel)
 pipeline <- function(dates,values)
 {
-  bm <- getBestModel(dates,values,"quarter",graph = F)
-  pred <- prepare.ts(dates,values,"quarter") %>%
-    my.predictions(bm$best)
+  pred <- getBestModel(dates,values,"quarter",graph = F)  %>%
+    my.predictions()
   return(pred)
 }
 doMC::registerDoMC(parallel::detectCores()-1) # parallel backend (for UNIX)

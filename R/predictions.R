@@ -1,10 +1,9 @@
 
-#' Make predictions with desired algorithms, combine them with observed data and gather everything
-#' in one final dataframe. If you want to save time, skip the sarima algorithm which is much slower
+#' Make predictions with desired algorithms, combine them with observed data in one final dataframe.
 #'
-#' @param prepedTS A list created by the \code{prepare.ts()} function
-#' @param algos A list containing the algorithms to be implemented
-#' @param bagged A boolean indicating weather a "bagged" estimator (simple average of all algorithm) should be computed.
+#' @param bestmod A list produced by the \code{getBestModel()} function (optional if \code{prepredTS} is provided)
+#' @param prepedTS A list created by the \code{prepare.ts()} function (optional if \code{bestmod} provided)
+#' @param algos A list containing the algorithms to be implemented. If \code{bestmod} is supplied, this value is ignored, and taken from the best model object
 #' Using this option will overwrite the provided list of algorithms to implement them all
 #' @param n_pred Int number of periods to forecast forward (eg n_pred = 12 will lead to one year of prediction for monthly time series)
 #' @return A dataframe containing : date, actual observed values, one column per used algorithm, and
@@ -13,21 +12,26 @@
 #' @importFrom magrittr %>%
 #' @example library(lubridate)
 #' library(dplyr)
-#' dates <- seq(as_date("2000-01-01"),as_date("2010-12-31"),"month")
-#' values <- rnorm(length(dates))
-#' prepare.ts(dates = dates,values = values,freq = "month") %>%
-#'     my.predictions(algos=list("my.ets","my.prophet"))
+#' dates <- seq(lubridate::as_date("2005-01-01"),lubridate::as_date("2010-12-31"),"month")
+#' values <- 10+ 1:length(dates)/10 + rnorm(length(dates),mean = 0,sd = 10)
+#' ### Stand alone usage
+#' prepare.ts(dates,values,"month") %>%
+#'   my.predictions(prepedTS = .,algos = list("my.prophet","my.ets"))
+#' ### Standard input with bestmodel
+#' getBestModel(dates,values,freq = "month",n_test = 6) %>%
+#'   my.predictions()
 #'
-my.predictions <- function(prepedTS,
+my.predictions <- function(bestmod=NULL,prepedTS=NULL,
                            algos=list("my.prophet","my.ets", "my.sarima","my.tbats","my.bats","my.stlm","my.shortterm"),
-                           bagged=F,n_pred=NA)
+                           n_pred=NA)
 {
-
-  if (is.na(n_pred)) n_pred <- round(prepedTS$freq.num[1])
-  if (!rlang::is_empty(grep("my.bagged",algos))) bagged <- T ## Check if best is bagged algo
-
-  ### Implementing all algorithms if bagged estimator is requested
-  if (bagged==T) algos <- list("my.prophet","my.ets", "my.sarima","my.tbats","my.bats","my.stlm","my.shortterm")
+  if (is.null(bestmod) & is.null(prepedTS)) stop("I need a prepared TS or a best model object !")
+  if (!is.null(bestmod)){
+    if (bestmod$best=="my.bagged") algos <- bestmod$algos else algos <-bestmod$best
+    prepedTS <- bestmod$prepedTS
+    if (is.na(n_pred)) n_pred <- round(bestmod$prepedTS$freq.num[1])
+  }
+  if (is.na(n_pred) & is.null(bestmod)) n_pred <- round(prepedTS$freq.num[1])
 
   ### Test frequency for ets (doesn't run for freq higher than 24...)
   where_ets <- grep("ets",algos)
@@ -43,9 +47,9 @@ my.predictions <- function(prepedTS,
     algos <- algos[-where_short]
   }
 
-  algos <- lapply(algos,get)
+  algos_apply <- lapply(algos,get)
 
-    res <- lapply(algos,function(xx) xx(prepedTS,n_pred)) %>%
+  res <- lapply(algos_apply,function(xx) xx(prepedTS,n_pred)) %>%
     dplyr::bind_cols() %>%
     dplyr::select(dates, dplyr::starts_with("prev")) %>%
     tidyr::gather(key="var",value = "val",-dates) %>%
@@ -57,17 +61,20 @@ my.predictions <- function(prepedTS,
     dplyr::rename(actual.value=val) %>%
     dplyr::ungroup() %>%
     dplyr::select(-pred)
+  ### Compute simple mean of elected algorithms for bagged estimator
+  res$bagged <- dplyr::select(res,-dates,-type,-actual.value) %>%
+    apply(MARGIN = 1,mean)
 
-  if (bagged==T) ### Compute simple mean for bagged estimator
-  {
-    res$bagged <- dplyr::select(res,-dates,-type,-actual.value) %>%
-      apply(MARGIN = 1,mean)
-    res <-  dplyr::select(res,dates,type,actual.value,bagged)
-  }
+  if (is.null(bestmod)) keeps <- c(stringr::str_remove_all(unlist(algos),"my."),"bagged")
+  else keeps <- stringr::str_remove_all(unlist(bestmod$best),"my.")
+  # if (!is.null(bestmod)){
+  #   if (bestmod$best=="my.bagged") keeps <- "bagged" else keeps <- stringr::str_remove_all(unlist(algos),"my.")
+  # } else keeps <- stringr::str_remove_all(unlist(algos),"my.")
+  res <- dplyr::select_at(res,c("dates","type","actual.value",keeps))
   return(res)
 }
 
-#' Implement selected algorithms of the package, train them without the last observed year
+#' Implement selected algorithms of the package, train them without the last observed n data points
 #' (or n_test number of points), make a prediction, and returns the best performing algorithm on this period.
 #' If you want to save time, skip the SARIMA method.
 #'
@@ -76,9 +83,8 @@ my.predictions <- function(prepedTS,
 #' @param freq A chacracter string that indicates the frequency of the time series ("week", "month", "quarter", "day").
 #' @param complete A numerical value (or NA) to fill the missing data points
 #' @param n_test number of data points to keep aside for the test (default : one year)
-#' @param algos A list containing the algorithms to test
-#' @param bagged A boolean indicating weather a "bagged" estimator (simple average of all algorithm) should be computed.
-#' Using this option will overwrite the list of algorithms to implement them all
+#' @param algos A list containing the algorithms (strings, with prefix "my.") to test
+#' @param bagged A list of strings. list("auto") will use all available algoriths, skipping algos parameter. Else, specified algos will be used
 #' @param graph A boolean, if TRUE, comparison of algorithms is plotted
 #' @export
 #' @importFrom magrittr %>%
@@ -87,21 +93,27 @@ my.predictions <- function(prepedTS,
 #' @example library(lubridate)
 #' library(dplyr)
 #' library(ggplot2)
-#' dates <- seq(as_date("2000-01-01"),as_date("2010-12-31"),"month")
-#' values <- rnorm(length(dates))
-#' implement <- getBestModel(dates,values,freq = "month")
-#' res <- prepare.ts(dates,values,freq = "month") %>%
-#'   my.predictions(algos =list(implement$best))
+#' dates <- seq(lubridate::as_date("2005-01-01"),lubridate::as_date("2010-12-31"),"month")
+#' values <- 10+ 1:length(dates)/10 + rnorm(length(dates),mean = 0,sd = 10)
+#' which.model <- getBestModel(dates,values,freq = "month",n_test = 9)
+#' ### Custom set of algorithm (including for bagged estimator)
+#' which.model <- getBestModel(dates,values,freq = "month",n_test = 6,algos = list("my.prophet","my.ets"),bagged = "custom")
+#' ### Use MAE instead of RMSE
+#' which.model <- getBestModel(dates,values,freq = "month",n_test = 6,algos = list("my.prophet","my.ets"),
+#'                             bagged = "custom",metric.error = my.mae)
 
 
 getBestModel <- function(dates,values,
                          freq,complete=0,n_test=NA,graph=T,
                          algos=list("my.prophet","my.ets", "my.sarima","my.tbats","my.bats","my.stlm","my.shortterm"),
-                         bagged=T)
+                         bagged=list("auto"),
+                         metric.error = my.rmse)
 {
   freq.num <- getFrequency(freq)
+  if (is.na(n_test)) n_test <- freq.num[1] # by default, test over the last "seasonal period"
 
-  if (is.na(n_test)) n_test <- freq.num[1] # by default, test over the last observed year
+  ## if auto bagged model, all algos are implemented. Else, only specified algos are implemented (and used for bagged estimator)
+  if (unlist(bagged)=="auto") algos <- list("my.prophet","my.ets", "my.sarima","my.tbats","my.bats","my.stlm","my.shortterm")
 
   df <- complete.ts(dates,values,freq,complete=0)
 
@@ -109,26 +121,15 @@ getBestModel <- function(dates,values,
   fin <- df$dates[1:(length(df$dates)-n_test)] %>% max()
   df_filter <- dplyr::filter(df,dates<=fin)
 
-  prepedTS <- prepare.ts(df_filter$dates,df_filter$val,freq,complete)
+  my.TS <- prepare.ts(df_filter$dates,df_filter$val,freq,complete)
 
-  if (bagged==T) algos <- list("my.prophet","my.ets", "my.sarima","my.tbats","my.bats","my.stlm","my.shortterm")
-
-  train <- my.predictions(prepedTS,algos,n_pred = n_test) %>%
+  train <- my.predictions(prepedTS = my.TS,algos = algos,n_pred = n_test) %>%
     dplyr::select(-actual.value) %>%
     dplyr::full_join(df,by="dates") %>%
     dplyr::rename(actual.value=val)
-  ### Compute average for bagged model
-  if (bagged==T)
-  {
-    train$bagged <- dplyr::select(train,-dates,-type,-actual.value) %>%
-      apply(MARGIN = 1,mean)
-    train$bagged.noshortterm <- dplyr::select(train,-dates,-type,-actual.value,-shortterm,-bagged) %>%
-      apply(MARGIN = 1,mean)
-  }
 
   errors <- dplyr::filter(train,type=="mean") %>%
-    dplyr::summarise_if(is.numeric,
-                                function(xx) sqrt(mean((xx-train$actual.value)^2,na.rm = T))) %>%
+    dplyr::summarise_if(is.numeric,list(~metric.error(.,actual.value))) %>%
     dplyr::select(-actual.value)
 
   best <- names(errors)[apply(errors,which.min,MARGIN = 1)] %>% paste("my",.,sep=".")
@@ -142,6 +143,5 @@ getBestModel <- function(dates,values,
   {
     print(gg)
   }
-
-  return(list(best=best,train.errors=errors,graph.train=gg,res.train=train))
+  return(list(prepedTS=my.TS,best=best,train.errors=errors,res.train=train,algos=algos,graph.train=gg))
 }

@@ -2,23 +2,23 @@
 % Please edit documentation in R/predictions.R
 \name{my.predictions}
 \alias{my.predictions}
-\title{Make predictions with desired algorithms, combine them with observed data and gather everything
-in one final dataframe. If you want to save time, skip the sarima algorithm which is much slower}
+\title{Make predictions with desired algorithms, combine them with observed data and gather allxo
+in one final dataframe.}
 \usage{
 my.predictions(
-  prepedTS,
+  bestmod = NULL,
+  prepedTS = NULL,
   algos = list("my.prophet", "my.ets", "my.sarima", "my.tbats", "my.bats", "my.stlm",
     "my.shortterm"),
-  bagged = F,
   n_pred = NA
 )
 }
 \arguments{
+\item{bestmod}{A list produced by the getBestModel function}
+
 \item{prepedTS}{A list created by the \code{prepare.ts()} function}
 
-\item{algos}{A list containing the algorithms to be implemented}
-
-\item{bagged}{A boolean indicating weather a "bagged" estimator (simple average of all algorithm) should be computed.
+\item{algos}{A list containing the algorithms to be implemented. If \code{bestmod} is supplied, this value is ignored, and taken from the best model object
 Using this option will overwrite the provided list of algorithms to implement them all}
 
 \item{n_pred}{Int number of periods to forecast forward (eg n_pred = 12 will lead to one year of prediction for monthly time series)}
@@ -28,6 +28,6 @@ A dataframe containing : date, actual observed values, one column per used algor
 a column indicating the type of measure (mean prediction, upper or lower bound of CI)
 }
 \description{
-Make predictions with desired algorithms, combine them with observed data and gather everything
-in one final dataframe. If you want to save time, skip the sarima algorithm which is much slower
+Make predictions with desired algorithms, combine them with observed data and gather allxo
+in one final dataframe.
 }

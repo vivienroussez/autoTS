@@ -1,4 +1,4 @@
-# Package autoTS v0.8
+# Package autoTS v0.9
 
 ## Introduction
 
@@ -32,7 +32,7 @@ Warnings :
 The `getbestModel` and `my.predictions` functions also allow the user to compute a **bagged** estimator, defined as the mean of all implemented algorithms
 
 ## Usage
-
+**Warning : interface (getBestModel and my.predictions functions) changed as of version 0.9**
 Who is performing best on a random walk  with drift ??
 
 ```{r}
@@ -41,12 +41,12 @@ library(magrittr)
 
 ## Generate dummy data
 dates <- seq(lubridate::as_date("2005-01-01"),lubridate::as_date("2010-12-31"),"month")
-values <- 1:length(dates)/10 + rnorm(length(dates))
+values <- 10+ 1:length(dates)/10 + rnorm(length(dates),mean = 0,sd = 10)
 
-## Find best algo
+## Find best algo and predict on full sample
 implement <- getBestModel(dates,values,freq = "month",bagged = T)
-res <- prepare.ts(dates,values,freq="month") %>%
-  my.predictions(implement$best)
+getBestModel(dates,values,freq = "month",n_test = 6) %>% 
+  my.predictions()
 ```
 
 You can use the **shiny user interface** to upload a csv file with you own time series to test the prediction interactively. This allows only one prediction at a time ; for bulk prediction, use the code and refer to the example notebook contained in the package.
@@ -65,9 +65,8 @@ This package has been developped with very standard and arbitrary default values
 - Implement LSTM
 - Implement random forest 
 - Add parameters to tweak algorithms
-- Make prediction
-- Cross validate on the beginning year to evaluate wether keeping most recent data helps improve the models
-- Add more possible frequencies 
+- Allow cross validatation wrt starting date to evaluate wether keeping most recent data helps improving the models
+- Add more possible frequencies (infra-day ?)
 
 ## Available algorithms
 
@@ -110,6 +109,14 @@ A good general presentation of all algorithms (except prophet) can be found on t
 
 
 ## Changelog
+
+### Version 0.9 :
+
+- Correct error computation. Add error funtions in packages (rmse, mae)
+- Add outputs to bestmodel (errors, algorithms used)
+- Allow custom list of algos to compute bagged estimator
+- Allow my.predictions function to take bestmodel object as input
+- updated documentation
 
 ### Version 0.8 :
 

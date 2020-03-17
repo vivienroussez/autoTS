@@ -2,7 +2,7 @@
 % Please edit documentation in R/predictions.R
 \name{getBestModel}
 \alias{getBestModel}
-\title{Implement selected algorithms of the package, train them without the last observed year
+\title{Implement selected algorithms of the package, train them without the last observed n data points
 (or n_test number of points), make a prediction, and returns the best performing algorithm on this period.
 If you want to save time, skip the SARIMA method.}
 \usage{
@@ -15,7 +15,8 @@ getBestModel(
   graph = T,
   algos = list("my.prophet", "my.ets", "my.sarima", "my.tbats", "my.bats", "my.stlm",
     "my.shortterm"),
-  bagged = T
+  bagged = list("auto"),
+  metric.error = my.rmse
 )
 }
 \arguments{
@@ -31,17 +32,16 @@ getBestModel(
 
 \item{graph}{A boolean, if TRUE, comparison of algorithms is plotted}
 
-\item{algos}{A list containing the algorithms to test}
+\item{algos}{A list containing the algorithms (strings, with prefix "my.") to test}
 
-\item{bagged}{A boolean indicating weather a "bagged" estimator (simple average of all algorithm) should be computed.
-Using this option will overwrite the list of algorithms to implement them all}
+\item{bagged}{A list of strings. list("auto") will use all available algoriths, skipping algos parameter. Else, specified algos will be used}
 }
 \value{
 A list contraining a character string with the name of the best method,
 a gg object with the comparison between algorithms and a dataframe with predictions of all tried algorithms
 }
 \description{
-Implement selected algorithms of the package, train them without the last observed year
+Implement selected algorithms of the package, train them without the last observed n data points
 (or n_test number of points), make a prediction, and returns the best performing algorithm on this period.
 If you want to save time, skip the SARIMA method.
 }
