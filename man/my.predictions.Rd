@@ -2,8 +2,7 @@
 % Please edit documentation in R/predictions.R
 \name{my.predictions}
 \alias{my.predictions}
-\title{Make predictions with desired algorithms, combine them with observed data and gather allxo
-in one final dataframe.}
+\title{Make predictions with desired algorithms, combine them with observed data in one final dataframe.}
 \usage{
 my.predictions(
   bestmod = NULL,
@@ -14,9 +13,9 @@ my.predictions(
 )
 }
 \arguments{
-\item{bestmod}{A list produced by the getBestModel function}
+\item{bestmod}{A list produced by the \code{getBestModel()} function (optional if \code{prepredTS} is provided)}
 
-\item{prepedTS}{A list created by the \code{prepare.ts()} function}
+\item{prepedTS}{A list created by the \code{prepare.ts()} function (optional if \code{bestmod} provided)}
 
 \item{algos}{A list containing the algorithms to be implemented. If \code{bestmod} is supplied, this value is ignored, and taken from the best model object
 Using this option will overwrite the provided list of algorithms to implement them all}
@@ -28,6 +27,5 @@ A dataframe containing : date, actual observed values, one column per used algor
 a column indicating the type of measure (mean prediction, upper or lower bound of CI)
 }
 \description{
-Make predictions with desired algorithms, combine them with observed data and gather allxo
-in one final dataframe.
+Make predictions with desired algorithms, combine them with observed data in one final dataframe.
 }

@@ -31,6 +31,12 @@ Warnings :
 
 The `getbestModel` and `my.predictions` functions also allow the user to compute a **bagged** estimator, defined as the mean of all implemented algorithms
 
+## Installation
+
+You either use `devtool::install_github("vivienroussez/autoTS")` or download the tar.gz file of this repo and then run `ìnstall.package("path_to_tar.gz",repos=NULL)`.
+
+**Note :** for MacOs Catalina user, you should install first the [r-macos-rtools](https://github.com/rmacoslib/r-macos-rtools/releases)
+
 ## Usage
 **Warning : interface (getBestModel and my.predictions functions) changed as of version 0.9**
 Who is performing best on a random walk  with drift ??

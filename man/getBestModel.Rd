@@ -2,9 +2,8 @@
 % Please edit documentation in R/predictions.R
 \name{getBestModel}
 \alias{getBestModel}
-\title{Implement selected algorithms of the package, train them without the last observed n data points
-(or n_test number of points), make a prediction, and returns the best performing algorithm on this period.
-If you want to save time, skip the SARIMA method.}
+\title{Implement selected algorithms of the package, train them without the last n observed data points
+(or n_test number of points), and compares the results to reality to determine the best algorithm}
 \usage{
 getBestModel(
   dates,
@@ -15,7 +14,7 @@ getBestModel(
   graph = T,
   algos = list("my.prophet", "my.ets", "my.sarima", "my.tbats", "my.bats", "my.stlm",
     "my.shortterm"),
-  bagged = list("auto"),
+  bagged = "auto",
   metric.error = my.rmse
 )
 }
@@ -32,16 +31,18 @@ getBestModel(
 
 \item{graph}{A boolean, if TRUE, comparison of algorithms is plotted}
 
-\item{algos}{A list containing the algorithms (strings, with prefix "my.") to test}
+\item{algos}{A list containing the algorithms (strings, with prefix "my.") to be tested}
 
-\item{bagged}{A list of strings. list("auto") will use all available algoriths, skipping algos parameter. Else, specified algos will be used}
+\item{bagged}{A string. "auto" will use all available algoriths, skipping algos parameter. Else, specified algos  of the `algo` parameter will be used}
+
+\item{metric.error}{a function to compute the error the each models. available functions : my.rmse and my.mae}
 }
 \value{
 A list contraining a character string with the name of the best method,
-a gg object with the comparison between algorithms and a dataframe with predictions of all tried algorithms
+a gg object with the comparison between algorithms and a dataframe with predictions of all tried algorithms,
+a dtaframe containing the errors of each algorithms, the preparedTS object and the list of algorithms tested
 }
 \description{
-Implement selected algorithms of the package, train them without the last observed n data points
-(or n_test number of points), make a prediction, and returns the best performing algorithm on this period.
-If you want to save time, skip the SARIMA method.
+Implement selected algorithms of the package, train them without the last n observed data points
+(or n_test number of points), and compares the results to reality to determine the best algorithm
 }
