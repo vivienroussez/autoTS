@@ -1,7 +1,7 @@
 Package: autoTS
 Type: Package
 Title: Easily predict univariate time series
-Version: 0.8.0
+Version: 0.9.0
 Author: Vivien Roussez
 Maintainer: Vivien Roussez <vivien.roussez@gmail.com>
 Description: This packages provides a set of functions that

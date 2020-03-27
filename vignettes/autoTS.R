@@ -18,7 +18,7 @@ dat <- mutate(dat,dates=yq(as.character(TIME)),
            UNIT == "Current prices, million euro")
 
 filter(dat,GEO %in% c("France","Austria")) %>% 
-  ggplot(aes(dates,values,color=GEO)) + geom_line() + theme_light() +
+  ggplot(aes(dates,values,color=GEO)) + geom_line() + theme_minimal() +
   labs(title="GDP of (completely) random countries")
 
 ## -----------------------------------------------------------------------------
@@ -28,20 +28,25 @@ preparedTS <- prepare.ts(ex1$dates,ex1$values,"quarter")
 ## What is in this new object ?
 str(preparedTS)
 plot.ts(preparedTS$obj.ts)
-ggplot(preparedTS$obj.df,aes(dates,val)) + geom_line() + theme_light()
+ggplot(preparedTS$obj.df,aes(dates,val)) + geom_line() + theme_minimal()
 
+
+
+## -----------------------------------------------------------------------------
 ## What is the best model for prediction ?
 best.algo <- getBestModel(ex1$dates,ex1$values,"quarter",graph = F)
 names(best.algo)
 print(paste("The best algorithm is",best.algo$best))
 best.algo$graph.train
 
+
+## -----------------------------------------------------------------------------
 ## Build the predictions
 final.pred <- my.predictions(bestmod = best.algo)
 tail(final.pred,24)
 ggplot(final.pred) + geom_line(aes(dates,actual.value),color="black") + 
   geom_line(aes_string("dates",stringr::str_remove(best.algo$best,"my."),linetype="type"),color="red") +
-  theme_light() 
+  theme_minimal() 
 
 ## -----------------------------------------------------------------------------
 suppressPackageStartupMessages(library(tidyr))

@@ -1,5 +1,7 @@
 ---
 title: "Introduction to autoTS"
+author: "Vivien Roussez"
+package: "autoTS"
 output: 
   rmarkdown::html_vignette
 vignette: >
@@ -64,7 +66,7 @@ dat <- mutate(dat,dates=yq(as.character(TIME)),
            UNIT == "Current prices, million euro")
 
 filter(dat,GEO %in% c("France","Austria")) %>% 
-  ggplot(aes(dates,values,color=GEO)) + geom_line() + theme_light() +
+  ggplot(aes(dates,values,color=GEO)) + geom_line() + theme_minimal() +
   labs(title="GDP of (completely) random countries")
 ```
 
@@ -79,15 +81,6 @@ Let's see how to use the package on one time series :
 - Train algo and determine which one is the best (over the last known year)
 - Implement the best algorithm on full data
 
-You find in the result of this function :
-
-- The name of the best model
-- The errors of each algorithm on the test set
-- The graphic of the train step
-- The prepared time series
-
-The result of this function can be used as direct input of the `my.prediction` function
-
 ```{r}
 ex1 <- filter(dat,GEO=="France") 
 preparedTS <- prepare.ts(ex1$dates,ex1$values,"quarter")
@@ -95,20 +88,39 @@ preparedTS <- prepare.ts(ex1$dates,ex1$values,"quarter")
 ## What is in this new object ?
 str(preparedTS)
 plot.ts(preparedTS$obj.ts)
-ggplot(preparedTS$obj.df,aes(dates,val)) + geom_line() + theme_light()
+ggplot(preparedTS$obj.df,aes(dates,val)) + geom_line() + theme_minimal()
 
+
+```
+
+Get the best algorithm for this time series :
+
+```{r}
 ## What is the best model for prediction ?
 best.algo <- getBestModel(ex1$dates,ex1$values,"quarter",graph = F)
 names(best.algo)
 print(paste("The best algorithm is",best.algo$best))
 best.algo$graph.train
 
+```
+
+You find in the result of this function :
+
+- The name of the best model
+- The errors of each algorithm on the test set
+- The graphic of the train step
+- The prepared time series
+- The list of used algorithm (that you can customize)
+
+The result of this function can be used as direct input of the `my.prediction` function
+
+```{r}
 ## Build the predictions
 final.pred <- my.predictions(bestmod = best.algo)
 tail(final.pred,24)
 ggplot(final.pred) + geom_line(aes(dates,actual.value),color="black") + 
   geom_line(aes_string("dates",stringr::str_remove(best.algo$best,"my."),linetype="type"),color="red") +
-  theme_light() 
+  theme_minimal() 
 ```
 
 Not too bad, right ?
