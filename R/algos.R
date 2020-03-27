@@ -185,9 +185,10 @@ my.stlm <- function(prepedTS,n_pred)
 my.shortterm <- function(prepedTS,n_pred,smooth_window=2)
 {
   season_comp <- round(min(prepedTS$freq.num))
+  adjust_fake <- season_comp-nrow(prepedTS$obj.df)%%season_comp-1
+
   dat <- prepedTS$obj.df %>%
-    dplyr::mutate(fake_year = floor((dplyr::row_number())/min(prepedTS$freq.num))) ## create variable for aggregation for specific periodicity
-  ## Compute "season" component
+    dplyr::mutate(fake_year =  (dplyr::row_number()+adjust_fake)%/%season_comp) ## create variable for aggregation for specific periodicity  ## Compute "season" component
   agg_years <-dplyr::group_by(dat,fake_year) %>%
     dplyr::summarise(usage_year=sum(val))
 

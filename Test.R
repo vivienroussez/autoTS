@@ -1,9 +1,9 @@
 library(autoTS)
 library(magrittr)
 
-dates <- seq(lubridate::as_date("2005-01-01"),lubridate::as_date("2010-12-31"),"month")
-values <- 10+ 1:length(dates)/10 + rnorm(length(dates),mean = 0,sd = 10)
-# prepare.ts(dates,values,"day") %>% my.prophet(n_pred=12)
+dates <- seq(lubridate::as_date("2005-06-02"),lubridate::as_date("2010-12-31"),"week")
+values <- 100+ 1:length(dates)/10 + rnorm(length(dates),mean = 0,sd = 10)
+prepedTS <- prepare.ts(dates,values,"week")
 
 getBestModel(dates,values,freq = "month",n_test = 6) %>%
   my.predictions()
