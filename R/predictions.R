@@ -122,9 +122,9 @@ getBestModel <- function(dates,values,
   fin <- df$dates[1:(length(df$dates)-n_test)] %>% max()
   df_filter <- dplyr::filter(df,dates<=fin)
 
-  my.TS <- prepare.ts(df_filter$dates,df_filter$val,freq,complete)
-
-  train <- my.predictions(prepedTS = my.TS,algos = algos,n_pred = n_test) %>%
+  full.TS <- prepare.ts(df$dates,df$val,freq,complete)
+  filtered.TS <- prepare.ts(df_filter$dates,df_filter$val,freq,complete)
+  train <- my.predictions(prepedTS = filtered.TS,algos = algos,n_pred = n_test) %>%
     dplyr::select(-actual.value) %>%
     dplyr::full_join(df,by="dates") %>%
     dplyr::rename(actual.value=val)
@@ -144,5 +144,5 @@ getBestModel <- function(dates,values,
   {
     print(gg)
   }
-  return(list(prepedTS=my.TS,best=best,train.errors=errors,res.train=train,algos=algos,graph.train=gg))
+  return(list(prepedTS=full.TS,best=best,train.errors=errors,res.train=train,algos=algos,graph.train=gg))
 }

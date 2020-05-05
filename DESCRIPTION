@@ -1,7 +1,7 @@
 Package: autoTS
 Type: Package
 Title: Easily predict univariate time series
-Version: 0.9.0
+Version: 0.9.1
 Author: Vivien Roussez
 Maintainer: Vivien Roussez <vivien.roussez@gmail.com>
 Description: This packages provides a set of functions that
@@ -10,19 +10,15 @@ License: GPL-3
 Encoding: UTF-8
 LazyData: true
 Imports:
-    stats,
+    rlang,
+    prophet,
     dplyr,
     magrittr,
     lubridate,
     tidyr,
     forecast,
     ggplot2,
-    RcppRoll,
-    plotly,
-    shiny,
-    shinycssloaders
-Depends:
-    prophet
-Suggests: knitr, rmarkdown,stringr,doMC,doParallel
+    RcppRoll
+Suggests: knitr,rmarkdown,stringr,doMC,doParallel,shiny,shinycssloaders,plotly
 VignetteBuilder: knitr
 RoxygenNote: 7.1.0

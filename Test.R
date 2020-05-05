@@ -5,13 +5,15 @@ dates <- seq(lubridate::as_date("2005-06-02"),lubridate::as_date("2010-12-31"),"
 values <- 100+ 1:length(dates)/10 + rnorm(length(dates),mean = 0,sd = 10)
 prepedTS <- prepare.ts(dates,values,"week")
 
-getBestModel(dates,values,freq = "month",n_test = 6) %>%
+tt <- getBestModel(dates,values,freq = "week",n_test = 6) %>%
   my.predictions()
 
 ##########################
 #### Monthly data ########
 ##########################
 
+dates <- seq(lubridate::as_date("2005-06-02"),lubridate::as_date("2010-12-31"),"month")
+values <- 100+ 1:length(dates)/10 + rnorm(length(dates),mean = 0,sd = 10)
 ## Find best algo
 which.model <- getBestModel(dates,values,freq = "month",n_test = 6)
 ## implement best algo
@@ -21,7 +23,8 @@ my.predictions(prepedTS = which.model$prepedTS) %>% View()
 
 ## standalone usage
 prepare.ts(dates,values,"month") %>%
-  my.predictions(prepedTS = .,algos = list("my.prophet","my.ets"))
+  my.predictions(prepedTS = .,algos = list("my.prophet","my.ets")) %>%
+  View()
 
 ## force model to be bagged
 which.model <- getBestModel(dates,values,freq = "month",n_test = 6)
