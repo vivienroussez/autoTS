@@ -2,7 +2,7 @@
 % Please edit documentation in R/error_metrics.R
 \name{my.rmse}
 \alias{my.rmse}
-\title{Custom (internal) function for RMSE (not found in basic packages)}
+\title{Custom (internal) function for RMSE}
 \usage{
 my.rmse(true, predicted)
 }
@@ -15,5 +15,5 @@ my.rmse(true, predicted)
 Num value with RMSE
 }
 \description{
-Custom (internal) function for RMSE (not found in basic packages)
+Custom (internal) function for RMSE
 }

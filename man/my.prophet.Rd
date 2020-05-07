@@ -2,7 +2,7 @@
 % Please edit documentation in R/algos.R
 \name{my.prophet}
 \alias{my.prophet}
-\title{Make a prediction with prophet algorithm for one year after last oberved point}
+\title{Fit prophet algorithm and make the prediction}
 \usage{
 my.prophet(prepedTS, n_pred)
 }
@@ -15,5 +15,13 @@ my.prophet(prepedTS, n_pred)
 A dataframe for "next year" with 4 columns : date, average prediction, upper and lower 95% confidence interval bounds
 }
 \description{
-Make a prediction with prophet algorithm for one year after last oberved point
+Fit prophet algorithm and make the prediction
+}
+\examples{
+library(lubridate)
+library(dplyr)
+dates <- seq(as_date("2000-01-01"),as_date("2010-12-31"),"month")
+values <- rnorm(length(dates))
+my.ts <- prepare.ts(dates,values,"month",complete = 0)
+my.prophet(my.ts,n_pred=12)
 }

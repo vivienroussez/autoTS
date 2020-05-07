@@ -21,3 +21,10 @@ A dataframe with 2 columns : date and val, with additional rows
 \description{
 Creates additional dates and values when NA where removed and the TS is not complete
 }
+\examples{
+library(lubridate)
+library(dplyr)
+dates <- seq(as_date("2000-01-01"),as_date("2010-12-31"),"month")
+values <- rnorm(length(dates))
+complete.ts(dates,values,"month",complete = 0)
+}

@@ -2,7 +2,7 @@
 % Please edit documentation in R/algos.R
 \name{my.sarima}
 \alias{my.sarima}
-\title{Make a prediction with SARIMA algorithm for one year after last oberved point}
+\title{Fit SARIMA algorithm and make the prediction}
 \usage{
 my.sarima(prepedTS, n_pred)
 }
@@ -15,5 +15,17 @@ my.sarima(prepedTS, n_pred)
 A dataframe with 4 columns : date, average prediction, upper and lower 95% confidence interval bounds
 }
 \description{
-Make a prediction with SARIMA algorithm for one year after last oberved point
+Fit SARIMA algorithm and make the prediction
+}
+\examples{
+ library(lubridate)
+library(dplyr)
+dates <- seq(as_date("2000-01-01"),as_date("2010-12-31"),"month")
+values <- rnorm(length(dates))
+my.ts <- prepare.ts(dates,values,"month",complete = 0)
+\dontrun{
+my.sarima(my.ts,n_pred=12)
+}
+
+
 }

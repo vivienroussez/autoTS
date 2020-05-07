@@ -1,10 +1,11 @@
 Package: autoTS
 Type: Package
-Title: Easily predict univariate time series
+Title: Automatic Model Selection and Prediction for Univariate Time Series
 Version: 0.9.1
 Author: Vivien Roussez
 Maintainer: Vivien Roussez <vivien.roussez@gmail.com>
-Description: This packages provides a set of functions that
+Description: Easily predict univariate time series.
+    A set of functions that
     helps to model and make predictions for univariate time series.
 License: GPL-3
 Encoding: UTF-8
@@ -19,6 +20,6 @@ Imports:
     forecast,
     ggplot2,
     RcppRoll
-Suggests: knitr,rmarkdown,stringr,doMC,doParallel,shiny,shinycssloaders,plotly
+Suggests: knitr,rmarkdown,stringr,doParallel,shiny,shinycssloaders,plotly
 VignetteBuilder: knitr
 RoxygenNote: 7.1.0

@@ -2,7 +2,7 @@
 % Please edit documentation in R/error_metrics.R
 \name{my.mae}
 \alias{my.mae}
-\title{Custom (internal) function for MAE (not found in basic packages)}
+\title{Custom (internal) function for MAE}
 \usage{
 my.mae(true, predicted)
 }
@@ -15,5 +15,5 @@ my.mae(true, predicted)
 Num value with MAE
 }
 \description{
-Custom (internal) function for MAE (not found in basic packages)
+Custom (internal) function for MAE
 }

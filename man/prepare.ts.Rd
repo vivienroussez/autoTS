@@ -2,8 +2,7 @@
 % Please edit documentation in R/prepare_ts.R
 \name{prepare.ts}
 \alias{prepare.ts}
-\title{Creates a list with the time series in a dataframe and a ts object, and the frequency stored
-in decimal and litteral values. The result is meant to be put in the prophet or forecast functions}
+\title{Format 2 vectors in a proper object usable by all algorithms}
 \usage{
 prepare.ts(dates, values, freq, complete = 0)
 }
@@ -20,6 +19,19 @@ prepare.ts(dates, values, freq, complete = 0)
 A list containing : a dataframe, a ts vector for the time series, and 2 scalars for its frequency
 }
 \description{
+Format 2 vectors in a proper object usable by all algorithms
+}
+\details{
 Creates a list with the time series in a dataframe and a ts object, and the frequency stored
 in decimal and litteral values. The result is meant to be put in the prophet or forecast functions
+}
+\examples{
+library(lubridate)
+library(dplyr)
+library(ggplot2)
+dates <- seq(lubridate::as_date("2000-01-01"),lubridate::as_date("2010-12-31"),"quarter")
+values <- rnorm(length(dates))
+my.ts <- prepare.ts(dates,values,"month",complete = 0)
+plot(my.ts$obj.ts)
+ggplot(my.ts$obj.df,aes(dates,val)) + geom_line()
 }

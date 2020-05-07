@@ -2,8 +2,7 @@
 % Please edit documentation in R/predictions.R
 \name{getBestModel}
 \alias{getBestModel}
-\title{Implement selected algorithms of the package, train them without the last n observed data points
-(or n_test number of points), and compares the results to reality to determine the best algorithm}
+\title{Determine best algorithm}
 \usage{
 getBestModel(
   dates,
@@ -43,6 +42,27 @@ a gg object with the comparison between algorithms and a dataframe with predicti
 a dtaframe containing the errors of each algorithms, the preparedTS object and the list of algorithms tested
 }
 \description{
-Implement selected algorithms of the package, train them without the last n observed data points
+Implement selected algorithms, train them without the last n observed data points
 (or n_test number of points), and compares the results to reality to determine the best algorithm
+}
+\examples{
+library(lubridate)
+library(dplyr)
+library(ggplot2)
+dates <- seq(lubridate::as_date("2005-01-01"),lubridate::as_date("2010-12-31"),"month")
+values <- 10+ 1:length(dates)/10 + rnorm(length(dates),mean = 0,sd = 10)
+\dontrun{
+which.model <- getBestModel(dates,values,freq = "month",n_test = 9)
+}
+### Custom set of algorithm (including for bagged estimator)
+\dontrun{
+which.model <- getBestModel(dates,values,freq = "month",n_test = 6,
+                            algos = list("my.prophet","my.ets"),bagged = "custom")
+                            }
+### Use MAE instead of RMSE
+\dontrun{
+which.model <- getBestModel(dates,values,freq = "month",n_test = 6,
+                            algos = list("my.prophet","my.ets"),
+                            bagged = "custom",metric.error = my.mae)
+                            }
 }

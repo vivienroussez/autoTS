@@ -2,8 +2,7 @@
 % Please edit documentation in R/algos.R
 \name{my.shortterm}
 \alias{my.shortterm}
-\title{Make a prediction only upon previous year data. The prediction is built with last known smoothed evolution, previous year's
-seasonal components and the last yearly cumulated value. No confidence interval is provided with this method}
+\title{Fit short term algorithm and make the prediction}
 \usage{
 my.shortterm(prepedTS, n_pred, smooth_window = 2)
 }
@@ -19,6 +18,17 @@ Note that this algorithm cannot predict further than one year}
 A dataframe with 4 columns : date, average prediction, upper and lower 95% confidence interval bounds
 }
 \description{
-Make a prediction only upon previous year data. The prediction is built with last known smoothed evolution, previous year's
-seasonal components and the last yearly cumulated value. No confidence interval is provided with this method
+Fit short term algorithm and make the prediction
+}
+\details{
+this algorithm uses data of the last year and makes the prediction
+taking into account the seasonality and the evolution of the previous periods' evolution
+}
+\examples{
+library(lubridate)
+library(dplyr)
+dates <- seq(as_date("2000-01-01"),as_date("2010-12-31"),"week")
+values <- rnorm(length(dates))
+my.ts <- prepare.ts(dates,values,"week",complete = 0)
+my.shortterm(my.ts,n_pred=12)
 }

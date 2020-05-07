@@ -1,5 +1,8 @@
 
-#' Make predictions with desired algorithms, combine them with observed data in one final dataframe.
+#' Make predictions with selected algorithms
+#'
+#' @description Fit selected algorithms, make the predictions and combine
+#' the results along with observed data in one final dataframe.
 #'
 #' @param bestmod A list produced by the \code{getBestModel()} function (optional if \code{prepredTS} is provided)
 #' @param prepedTS A list created by the \code{prepare.ts()} function (optional if \code{bestmod} provided)
@@ -10,16 +13,23 @@
 #' a column indicating the type of measure (mean prediction, upper or lower bound of CI)
 #' @export
 #' @importFrom magrittr %>%
-#' @example library(lubridate)
+#' @importFrom rlang .data
+#' @importFrom stats predict
+#' @examples
+#' library(lubridate)
 #' library(dplyr)
 #' dates <- seq(lubridate::as_date("2005-01-01"),lubridate::as_date("2010-12-31"),"month")
 #' values <- 10+ 1:length(dates)/10 + rnorm(length(dates),mean = 0,sd = 10)
 #' ### Stand alone usage
+#' \dontrun{
 #' prepare.ts(dates,values,"month") %>%
 #'   my.predictions(prepedTS = .,algos = list("my.prophet","my.ets"))
+#'   }
 #' ### Standard input with bestmodel
+#' \dontrun{
 #' getBestModel(dates,values,freq = "month",n_test = 6) %>%
 #'   my.predictions()
+#'   }
 #'
 my.predictions <- function(bestmod=NULL,prepedTS=NULL,
                            algos=list("my.prophet","my.ets", "my.sarima","my.tbats","my.bats","my.stlm","my.shortterm"),
@@ -50,19 +60,19 @@ my.predictions <- function(bestmod=NULL,prepedTS=NULL,
   algos_apply <- lapply(algos,get)
 
   res <- lapply(algos_apply,function(xx) xx(prepedTS,n_pred)) %>%
-    dplyr::bind_cols() %>%
-    dplyr::select(dates, dplyr::starts_with("prev")) %>%
-    tidyr::gather(key="var",value = "val",-dates) %>%
-    tidyr::separate(var,into = c("pred","model","type"),sep="\\.") %>%
-    dplyr::group_by(dates,type) %>%
-    tidyr::spread(key = model,value = val) %>%
+    dplyr::bind_cols(.data) %>%
+    dplyr::select(.data$dates, dplyr::starts_with("prev")) %>%
+    tidyr::gather(key="var",value = "val",-.data$dates) %>%
+    tidyr::separate(.data$var,into = c("pred","model","type"),sep="\\.") %>%
+    dplyr::group_by(.data$dates,.data$type) %>%
+    tidyr::spread(key = .data$model,value = .data$val) %>%
     dplyr::full_join(prepedTS$obj.df,by="dates") %>%
-    dplyr::arrange(dates,type) %>%
-    dplyr::rename(actual.value=val) %>%
+    dplyr::arrange(.data$dates,.data$type) %>%
+    dplyr::rename(actual.value=.data$val) %>%
     dplyr::ungroup() %>%
-    dplyr::select(-pred)
+    dplyr::select(-.data$pred)
   ### Compute simple mean of elected algorithms for bagged estimator
-  res$bagged <- dplyr::select(res,-dates,-type,-actual.value) %>%
+  res$bagged <- dplyr::select(res,-.data$dates,-.data$type,-.data$actual.value) %>%
     apply(MARGIN = 1,mean)
 
   if (is.null(bestmod)) keeps <- c(stringr::str_remove_all(unlist(algos),"my."),"bagged")
@@ -74,7 +84,9 @@ my.predictions <- function(bestmod=NULL,prepedTS=NULL,
   return(res)
 }
 
-#' Implement selected algorithms of the package, train them without the last n observed data points
+#' Determine best algorithm
+#'
+#' @description Implement selected algorithms, train them without the last n observed data points
 #' (or n_test number of points), and compares the results to reality to determine the best algorithm
 #'
 #' @param dates A vector of dates that can be parsed by lubridate
@@ -88,20 +100,31 @@ my.predictions <- function(bestmod=NULL,prepedTS=NULL,
 #' @param metric.error a function to compute the error the each models. available functions : my.rmse and my.mae
 #' @export
 #' @importFrom magrittr %>%
+#' @importFrom rlang .data
+#' @importFrom stats predict
 #' @return A list contraining a character string with the name of the best method,
 #' a gg object with the comparison between algorithms and a dataframe with predictions of all tried algorithms,
 #' a dtaframe containing the errors of each algorithms, the preparedTS object and the list of algorithms tested
-#' @example library(lubridate)
+#' @examples
+#' library(lubridate)
 #' library(dplyr)
 #' library(ggplot2)
 #' dates <- seq(lubridate::as_date("2005-01-01"),lubridate::as_date("2010-12-31"),"month")
 #' values <- 10+ 1:length(dates)/10 + rnorm(length(dates),mean = 0,sd = 10)
+#' \dontrun{
 #' which.model <- getBestModel(dates,values,freq = "month",n_test = 9)
+#' }
 #' ### Custom set of algorithm (including for bagged estimator)
-#' which.model <- getBestModel(dates,values,freq = "month",n_test = 6,algos = list("my.prophet","my.ets"),bagged = "custom")
+#' \dontrun{
+#' which.model <- getBestModel(dates,values,freq = "month",n_test = 6,
+#'                             algos = list("my.prophet","my.ets"),bagged = "custom")
+#'                             }
 #' ### Use MAE instead of RMSE
-#' which.model <- getBestModel(dates,values,freq = "month",n_test = 6,algos = list("my.prophet","my.ets"),
+#' \dontrun{
+#' which.model <- getBestModel(dates,values,freq = "month",n_test = 6,
+#'                             algos = list("my.prophet","my.ets"),
 #'                             bagged = "custom",metric.error = my.mae)
+#'                             }
 
 
 getBestModel <- function(dates,values,
@@ -110,6 +133,7 @@ getBestModel <- function(dates,values,
                          bagged="auto",
                          metric.error = my.rmse)
 {
+  . <- NULL
   freq.num <- getFrequency(freq)
   if (is.na(n_test)) n_test <- freq.num[1] # by default, test over the last "seasonal period"
 
@@ -119,27 +143,28 @@ getBestModel <- function(dates,values,
   df <- complete.ts(dates,values,freq,complete=0)
 
   ## filter out the last year and create proper object for algos
-  fin <- df$dates[1:(length(df$dates)-n_test)] %>% max()
+  fin <- max(df$dates[1:(length(df$dates)-n_test)])
   df_filter <- dplyr::filter(df,dates<=fin)
 
   full.TS <- prepare.ts(df$dates,df$val,freq,complete)
   filtered.TS <- prepare.ts(df_filter$dates,df_filter$val,freq,complete)
   train <- my.predictions(prepedTS = filtered.TS,algos = algos,n_pred = n_test) %>%
-    dplyr::select(-actual.value) %>%
+    dplyr::select(-.data$actual.value) %>%
     dplyr::full_join(df,by="dates") %>%
-    dplyr::rename(actual.value=val)
+    dplyr::rename(actual.value=.data$val)
 
-  errors <- dplyr::filter(train,type=="mean") %>%
-    dplyr::summarise_if(is.numeric,list(~metric.error(.,actual.value))) %>%
-    dplyr::select(-actual.value)
+  errors <- dplyr::filter(train,.data$type=="mean") %>%
+    dplyr::summarise_if(is.numeric,list(~metric.error(.,.data$actual.value))) %>%
+    dplyr::select(-.data$actual.value)
 
   best <- names(errors)[apply(errors,which.min,MARGIN = 1)] %>% paste("my",.,sep=".")
 
   ### Graph comparing actual values & algo predictions
-  ddd <- dplyr::filter(train,type %in% c(NA,"mean")) %>%
-    dplyr::select(-type) %>%
-    tidyr::gather(key="algo",value=val,-dates)
-  gg <- ggplot2::ggplot(ddd,ggplot2::aes(dates,val,color=algo)) + ggplot2::geom_line() + ggplot2::theme_minimal()
+  ddd <- dplyr::filter(train,.data$type %in% c(NA,"mean")) %>%
+    dplyr::select(-.data$type) %>%
+    tidyr::gather(key="algo",value="val",-.data$dates)
+  gg <- ggplot2::ggplot(ddd,ggplot2::aes(.data$dates,.data$val,color=.data$algo)) +
+    ggplot2::geom_line() + ggplot2::theme_minimal()
   if (graph==T)
   {
     print(gg)

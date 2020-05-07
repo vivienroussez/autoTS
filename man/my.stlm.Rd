@@ -2,7 +2,7 @@
 % Please edit documentation in R/algos.R
 \name{my.stlm}
 \alias{my.stlm}
-\title{Make a prediction with STLM algorithm for one year after last oberved point}
+\title{Fit STLM algorithm and make the prediction}
 \usage{
 my.stlm(prepedTS, n_pred)
 }
@@ -15,5 +15,14 @@ my.stlm(prepedTS, n_pred)
 A dataframe with 4 columns : date, average prediction, upper and lower 95% confidence interval bounds
 }
 \description{
-Make a prediction with STLM algorithm for one year after last oberved point
+Fit STLM algorithm and make the prediction
+}
+\examples{
+library(lubridate)
+library(dplyr)
+dates <- seq(as_date("2000-01-01"),as_date("2010-12-31"),"week")
+values <- rnorm(length(dates))
+my.ts <- prepare.ts(dates,values,"week",complete = 0)
+my.stlm(my.ts,n_pred=12)
+
 }

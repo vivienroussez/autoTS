@@ -2,7 +2,7 @@
 % Please edit documentation in R/algos.R
 \name{my.bats}
 \alias{my.bats}
-\title{Make a prediction with BATS algorithm for one year after last oberved point}
+\title{Fit BATS algorithm and make the prediction}
 \usage{
 my.bats(prepedTS, n_pred)
 }
@@ -15,5 +15,14 @@ my.bats(prepedTS, n_pred)
 A dataframe with 4 columns : date, average prediction, upper and lower 95% confidence interval bounds
 }
 \description{
-Make a prediction with BATS algorithm for one year after last oberved point
+Fit BATS algorithm and make the prediction
+}
+\examples{
+library(lubridate)
+library(dplyr)
+dates <- seq(as_date("2000-01-01"),as_date("2010-12-31"),"week")
+values <- rnorm(length(dates))
+my.ts <- prepare.ts(dates,values,"week",complete = 0)
+my.bats(my.ts,n_pred=12)
+
 }

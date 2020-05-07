@@ -2,8 +2,7 @@
 % Please edit documentation in R/algos.R
 \name{my.ets}
 \alias{my.ets}
-\title{Make a prediction with ETS algorithm for one year after last oberved point
-TBATS differ from BATS in the way it models the seasonality}
+\title{Fit ETS algorithm and make the prediction}
 \usage{
 my.ets(prepedTS, n_pred)
 }
@@ -16,6 +15,14 @@ my.ets(prepedTS, n_pred)
 A dataframe with 4 columns : date, average prediction, upper and lower 95% confidence interval bounds
 }
 \description{
-Make a prediction with ETS algorithm for one year after last oberved point
-TBATS differ from BATS in the way it models the seasonality
+Fit ETS algorithm and make the prediction
+}
+\examples{
+ library(lubridate)
+library(dplyr)
+dates <- seq(as_date("2000-01-01"),as_date("2010-12-31"),"month")
+values <- rnorm(length(dates))
+my.ts <- prepare.ts(dates,values,"month",complete = 0)
+my.ets(my.ts,n_pred=12)
+
 }

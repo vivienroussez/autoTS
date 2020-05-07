@@ -2,7 +2,7 @@
 % Please edit documentation in R/prepare_ts.R
 \name{getFrequency}
 \alias{getFrequency}
-\title{Determines the decimal frequency of a time series from}
+\title{Determines the decimal frequency of a time series from a character string}
 \usage{
 getFrequency(freq.alpha)
 }
@@ -13,7 +13,7 @@ getFrequency(freq.alpha)
 The decimal version of the frequency (useful for the forecast package functions).
 }
 \description{
-Determines the decimal frequency of a time series from
+Determines the decimal frequency of a time series from a character string
 }
 \examples{
 getFrequency("week")

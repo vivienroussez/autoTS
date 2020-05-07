@@ -2,7 +2,7 @@
 % Please edit documentation in R/predictions.R
 \name{my.predictions}
 \alias{my.predictions}
-\title{Make predictions with desired algorithms, combine them with observed data in one final dataframe.}
+\title{Make predictions with selected algorithms}
 \usage{
 my.predictions(
   bestmod = NULL,
@@ -27,5 +27,23 @@ A dataframe containing : date, actual observed values, one column per used algor
 a column indicating the type of measure (mean prediction, upper or lower bound of CI)
 }
 \description{
-Make predictions with desired algorithms, combine them with observed data in one final dataframe.
+Fit selected algorithms, make the predictions and combine
+the results along with observed data in one final dataframe.
+}
+\examples{
+library(lubridate)
+library(dplyr)
+dates <- seq(lubridate::as_date("2005-01-01"),lubridate::as_date("2010-12-31"),"month")
+values <- 10+ 1:length(dates)/10 + rnorm(length(dates),mean = 0,sd = 10)
+### Stand alone usage
+\dontrun{
+prepare.ts(dates,values,"month") \%>\%
+  my.predictions(prepedTS = .,algos = list("my.prophet","my.ets"))
+  }
+### Standard input with bestmodel
+\dontrun{
+getBestModel(dates,values,freq = "month",n_test = 6) \%>\%
+  my.predictions()
+  }
+
 }

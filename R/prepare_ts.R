@@ -2,7 +2,7 @@
 # library(tidyr)
 # library(lubridate)
 
-#' Determines the decimal frequency of a time series from
+#' Determines the decimal frequency of a time series from a character string
 #'
 #' @param freq.alpha A character string that indicates the frequency of the time series ("week", "month", "quarter", "day").
 #' @return The decimal version of the frequency (useful for the forecast package functions).
@@ -29,7 +29,10 @@ getFrequency <- function(freq.alpha) ## get numerical frequency from alphanumeri
 #' @return A dataframe with 2 columns : date and val, with additional rows
 #' @export
 #' @importFrom magrittr %>%
-#' @example library(lubridate)
+#' @importFrom rlang .data
+#' @importFrom stats predict
+#' @examples
+#' library(lubridate)
 #' library(dplyr)
 #' dates <- seq(as_date("2000-01-01"),as_date("2010-12-31"),"month")
 #' values <- rnorm(length(dates))
@@ -42,15 +45,17 @@ complete.ts <- function(dates,values,freq,complete=0) ### creates explicit 0 or 
     # gather in DF
     df <- data.frame(dates=lubridate::as_date(dates),val=values)
     # Complete the holes with zeros (or NA...)
-    dd <- seq(min(df$dates),max(df$dates),by=freq) %>%
-      data.frame(dates=.) %>%
+    dd <- seq(min(df$dates),max(df$dates),by=freq)
+    dd <- data.frame(dates=dd) %>%
       dplyr::left_join(df,by="dates") %>%
-      dplyr::mutate(val=tidyr::replace_na(val,0))
+      dplyr::mutate(val=tidyr::replace_na(.data$val,0))
     return(dd)
   }
 }
 
-#' Creates a list with the time series in a dataframe and a ts object, and the frequency stored
+#' Format 2 vectors in a proper object usable by all algorithms
+#'
+#' @details Creates a list with the time series in a dataframe and a ts object, and the frequency stored
 #' in decimal and litteral values. The result is meant to be put in the prophet or forecast functions
 #'
 #' @param dates A vector of dates that can be parsed by lubridate
@@ -60,7 +65,10 @@ complete.ts <- function(dates,values,freq,complete=0) ### creates explicit 0 or 
 #' @return A list containing : a dataframe, a ts vector for the time series, and 2 scalars for its frequency
 #' @export
 #' @importFrom magrittr %>%
-#' @example library(lubridate)
+#' @importFrom rlang .data
+#' @importFrom stats predict
+#' @examples
+#' library(lubridate)
 #' library(dplyr)
 #' library(ggplot2)
 #' dates <- seq(lubridate::as_date("2000-01-01"),lubridate::as_date("2010-12-31"),"quarter")
