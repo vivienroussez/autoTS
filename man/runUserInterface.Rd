@@ -2,10 +2,19 @@
 % Please edit documentation in R/Interface.R
 \name{runUserInterface}
 \alias{runUserInterface}
-\title{Lauches the shiny demo app for testing the package from a simple CSV file}
+\title{Demo graphical user interface}
 \usage{
 runUserInterface()
 }
 \description{
-Lauches the shiny demo app for testing the package from a simple CSV file
+A shiny application that allows the user to load a properly formated CSV file,
+benchmark the algorithms, make a prediction and download the results. Requires additional packages
+shiny, shinycssloaders, tidyr and plotly to be installed
+}
+\examples{
+\dontrun{
+autoTS::runUserInterface()
+}
+
+
 }

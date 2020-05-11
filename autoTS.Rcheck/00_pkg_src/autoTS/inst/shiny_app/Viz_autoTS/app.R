@@ -1,3 +1,12 @@
+#' Demo graphical user interface
+#'
+#' @description A shiny application that allows the user to load a properly formated CSV file,
+#' benchmark the algorithms, make a prediction and download the results. Requires additional packages
+#' shiny, shinycssloaders, tidyr and plotly to be installed
+#'
+#' @examples
+#' autoTS::runUserInterface()
+
 library(dplyr)
 library(tidyr)
 library(shiny)

@@ -1,6 +1,7 @@
 Package: autoTS
 Type: Package
-Title: Automatic Model Selection and Prediction for Univariate Time Series
+Title: Automatic Model Selection and Prediction for Univariate Time
+        Series
 Version: 0.9.1
 Author: Vivien Roussez
 Maintainer: Vivien Roussez <vivien.roussez@gmail.com>
@@ -13,18 +14,14 @@ Description: Offers a set of functions to easily make predictions for univariate
 License: GPL-3
 Encoding: UTF-8
 LazyData: true
-Imports:
-    rlang,
-    prophet,
-    dplyr,
-    magrittr,
-    lubridate,
-    tidyr,
-    forecast,
-    ggplot2,
-    RcppRoll
+Imports: rlang, prophet, dplyr, magrittr, lubridate, tidyr, forecast,
+        ggplot2, RcppRoll
 BugReports: https://github.com/vivienroussez/autots/issues
 URL: https://github.com/vivienroussez/autoTS
-Suggests: knitr,rmarkdown,stringr,doParallel,shiny,shinycssloaders,plotly
+Suggests:
+        knitr,rmarkdown,stringr,doParallel,shiny,shinycssloaders,plotly
 VignetteBuilder: knitr
 RoxygenNote: 7.1.0
+NeedsCompilation: no
+Packaged: 2020-05-11 06:27:31 UTC; vivien
+Built: R 4.0.0; ; 2020-05-11 06:28:34 UTC; unix

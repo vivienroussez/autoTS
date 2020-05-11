@@ -1,5 +1,6 @@
 library(autoTS)
 library(magrittr)
+library(rlang)
 
 dates <- seq(lubridate::as_date("2005-06-02"),lubridate::as_date("2010-12-31"),"week")
 values <- 100+ 1:length(dates)/10 + rnorm(length(dates),mean = 0,sd = 10)
@@ -19,7 +20,7 @@ which.model <- getBestModel(dates,values,freq = "month",n_test = 6)
 ## implement best algo
 my.predictions(which.model) %>% View()
 ## Implement all algos anyway
-my.predictions(prepedTS = which.model$prepedTS) %>% View()
+my.predictions(prepedTS = which.model$prepedTS,algos = "my.bagged") %>% View()
 
 ## standalone usage
 prepare.ts(dates,values,"month") %>%

@@ -1,5 +1,14 @@
-#' Lauches the shiny demo app for testing the package from a simple CSV file
+#' Demo graphical user interface
+#'
+#' @description A shiny application that allows the user to load a properly formated CSV file,
+#' benchmark the algorithms, make a prediction and download the results. Requires additional packages
+#' shiny, shinycssloaders, tidyr and plotly to be installed
+#'
 #' @export
+#' @examples
+#' \dontrun{
+#' autoTS::runUserInterface()
+#' }
 #'
 #'
 runUserInterface <- function() {
