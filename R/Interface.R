@@ -6,15 +6,11 @@
 #'
 #' @export
 #' @examples
-#' \dontrun{
 #' autoTS::runUserInterface()
-#' }
-#'
 #'
 runUserInterface <- function() {
-  appDir <- system.file("shiny_app", "Viz_autoTS", package = "autoTS")
+  appDir <- system.file("shiny-example", "Viz_autoTS", package = "autoTS")
   if (appDir == "") {
     stop("Could not find directory. Try re-installing `autoTS`.", call. = FALSE)
-  }
-  shiny::runApp(appDir, display.mode = "normal")
+  } else if (interactive()) shiny::runApp(appDir, display.mode = "normal")
 }

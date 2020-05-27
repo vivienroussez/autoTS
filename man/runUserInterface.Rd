@@ -12,9 +12,6 @@ benchmark the algorithms, make a prediction and download the results. Requires a
 shiny, shinycssloaders, tidyr and plotly to be installed
 }
 \examples{
-\dontrun{
 autoTS::runUserInterface()
-}
-
 
 }

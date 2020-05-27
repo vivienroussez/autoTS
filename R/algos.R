@@ -16,15 +16,15 @@
 #' @examples
 #' library(lubridate)
 #' library(dplyr)
-#' dates <- seq(as_date("2000-01-01"),as_date("2010-12-31"),"month")
+#' dates <- seq(as_date("2000-01-01"),as_date("2010-12-31"),"quarter")
 #' values <- rnorm(length(dates))
-#' my.ts <- prepare.ts(dates,values,"month",complete = 0)
-#' my.prophet(my.ts,n_pred=12)
+#' my.ts <- prepare.ts(dates,values,"quarter",complete = 0)
+#' my.prophet(my.ts,n_pred=4)
 
 my.prophet <- function(prepedTS,n_pred)
 {
   . <- NULL
-  if (prepedTS$freq.alpha=="day"){ws=T;ds=F;ys=T} else{ws=F;ds=F;ys=T}
+  if (prepedTS$freq.alpha=="day"){ws=TRUE;ds=FALSE;ys=TRUE} else{ws=FALSE;ds=FALSE;ys=TRUE}
   mod.prophet <- prepedTS$obj.df %>%
     dplyr::select(ds=.data$dates,y=.data$val) %>%
     prophet::prophet(weekly.seasonality = ws,daily.seasonality = ds,yearly.seasonality = ys)
@@ -52,17 +52,15 @@ my.prophet <- function(prepedTS,n_pred)
 #' @examples
 #'  library(lubridate)
 #' library(dplyr)
-#' dates <- seq(as_date("2000-01-01"),as_date("2010-12-31"),"month")
+#' dates <- seq(as_date("2000-01-01"),as_date("2010-12-31"),"quarter")
 #' values <- rnorm(length(dates))
-#' my.ts <- prepare.ts(dates,values,"month",complete = 0)
-#' \dontrun{
-#' my.sarima(my.ts,n_pred=12)
-#' }
+#' my.ts <- prepare.ts(dates,values,"quarter",complete = 0)
+#' my.sarima(my.ts,n_pred=4)
 #'
 #'
 my.sarima <- function(prepedTS,n_pred)
 {
-  prev.arima <- forecast::auto.arima(prepedTS$obj.ts,seasonal = T,D=1) %>%
+  prev.arima <- forecast::auto.arima(prepedTS$obj.ts,seasonal = TRUE,D=1) %>%
     forecast::forecast(h=n_pred)
   dates <- seq(max(prepedTS$obj.df$dates),by=prepedTS$freq.alpha,length.out = n_pred+1)[-1]
   prev.arima <- data.frame(dates=lubridate::as_date(dates),prev.sarima.mean=as.numeric(prev.arima$mean),
@@ -85,10 +83,10 @@ my.sarima <- function(prepedTS,n_pred)
 #' @examples
 #'  library(lubridate)
 #' library(dplyr)
-#' dates <- seq(as_date("2000-01-01"),as_date("2010-12-31"),"month")
+#' dates <- seq(as_date("2000-01-01"),as_date("2010-12-31"),"quarter")
 #' values <- rnorm(length(dates))
-#' my.ts <- prepare.ts(dates,values,"month",complete = 0)
-#' my.ets(my.ts,n_pred=12)
+#' my.ts <- prepare.ts(dates,values,"quarter",complete = 0)
+#' my.ets(my.ts,n_pred=4)
 #'
 
 my.ets <- function(prepedTS,n_pred)
@@ -113,10 +111,10 @@ my.ets <- function(prepedTS,n_pred)
 #' @examples
 #' library(lubridate)
 #' library(dplyr)
-#' dates <- seq(as_date("2000-01-01"),as_date("2010-12-31"),"week")
+#' dates <- seq(as_date("2000-01-01"),as_date("2010-12-31"),"quarter")
 #' values <- rnorm(length(dates))
-#' my.ts <- prepare.ts(dates,values,"week",complete = 0)
-#' my.tbats(my.ts,n_pred=12)
+#' my.ts <- prepare.ts(dates,values,"quarter",complete = 0)
+#' my.tbats(my.ts,n_pred=4)
 #'
 
 my.tbats <- function(prepedTS,n_pred)
@@ -141,10 +139,10 @@ my.tbats <- function(prepedTS,n_pred)
 #' @examples
 #' library(lubridate)
 #' library(dplyr)
-#' dates <- seq(as_date("2000-01-01"),as_date("2010-12-31"),"week")
+#' dates <- seq(as_date("2000-01-01"),as_date("2010-12-31"),"quarter")
 #' values <- rnorm(length(dates))
-#' my.ts <- prepare.ts(dates,values,"week",complete = 0)
-#' my.bats(my.ts,n_pred=12)
+#' my.ts <- prepare.ts(dates,values,"quarter",complete = 0)
+#' my.bats(my.ts,n_pred=4)
 #'
 
 my.bats <- function(prepedTS,n_pred)
@@ -170,10 +168,10 @@ my.bats <- function(prepedTS,n_pred)
 #' @examples
 #' library(lubridate)
 #' library(dplyr)
-#' dates <- seq(as_date("2000-01-01"),as_date("2010-12-31"),"week")
+#' dates <- seq(as_date("2000-01-01"),as_date("2010-12-31"),"quarter")
 #' values <- rnorm(length(dates))
-#' my.ts <- prepare.ts(dates,values,"week",complete = 0)
-#' my.stlm(my.ts,n_pred=12)
+#' my.ts <- prepare.ts(dates,values,"quarter",complete = 0)
+#' my.stlm(my.ts,n_pred=4)
 #'
 
 my.stlm <- function(prepedTS,n_pred)
@@ -204,10 +202,10 @@ my.stlm <- function(prepedTS,n_pred)
 #' @examples
 #' library(lubridate)
 #' library(dplyr)
-#' dates <- seq(as_date("2000-01-01"),as_date("2010-12-31"),"week")
+#' dates <- seq(as_date("2000-01-01"),as_date("2010-12-31"),"quarter")
 #' values <- rnorm(length(dates))
-#' my.ts <- prepare.ts(dates,values,"week",complete = 0)
-#' my.shortterm(my.ts,n_pred=12)
+#' my.ts <- prepare.ts(dates,values,"quarter",complete = 0)
+#' my.shortterm(my.ts,n_pred=4)
 
 my.shortterm <- function(prepedTS,n_pred,smooth_window=2)
 {
@@ -228,9 +226,9 @@ my.shortterm <- function(prepedTS,n_pred,smooth_window=2)
     dplyr::select(.data$dates,.data$val,.data$season)
 
   evols <- season %>%
-    dplyr::mutate(cum_year = RcppRoll::roll_sumr(.data$val,season_comp,na.rm=T),
-                  evol = RcppRoll::roll_sumr(.data$val,smooth_window,na.rm=T) /
-                    dplyr::lag(RcppRoll::roll_sumr(.data$val,smooth_window,na.rm=T),season_comp),
+    dplyr::mutate(cum_year = RcppRoll::roll_sumr(.data$val,season_comp,na.rm=TRUE),
+                  evol = RcppRoll::roll_sumr(.data$val,smooth_window,na.rm=TRUE) /
+                    dplyr::lag(RcppRoll::roll_sumr(.data$val,smooth_window,na.rm=TRUE),season_comp),
                   evol = ifelse( !(is.na(.data$evol) | is.nan(.data$evol) | is.infinite(.data$evol)),.data$evol,0) ) %>%
     dplyr::filter(dplyr::row_number()==dplyr::n()) %>%
     dplyr::select(-.data$dates,-.data$season,-.data$val)

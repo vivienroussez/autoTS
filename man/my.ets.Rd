@@ -20,9 +20,9 @@ Fit ETS algorithm and make the prediction
 \examples{
  library(lubridate)
 library(dplyr)
-dates <- seq(as_date("2000-01-01"),as_date("2010-12-31"),"month")
+dates <- seq(as_date("2000-01-01"),as_date("2010-12-31"),"quarter")
 values <- rnorm(length(dates))
-my.ts <- prepare.ts(dates,values,"month",complete = 0)
-my.ets(my.ts,n_pred=12)
+my.ts <- prepare.ts(dates,values,"quarter",complete = 0)
+my.ets(my.ts,n_pred=4)
 
 }

@@ -10,7 +10,7 @@ getBestModel(
   freq,
   complete = 0,
   n_test = NA,
-  graph = T,
+  graph = TRUE,
   algos = list("my.prophet", "my.ets", "my.sarima", "my.tbats", "my.bats", "my.stlm",
     "my.shortterm"),
   bagged = "auto",
@@ -46,23 +46,18 @@ Implement selected algorithms, train them without the last n observed data point
 (or n_test number of points), and compares the results to reality to determine the best algorithm
 }
 \examples{
-library(lubridate)
-library(dplyr)
-library(ggplot2)
-dates <- seq(lubridate::as_date("2005-01-01"),lubridate::as_date("2010-12-31"),"month")
+library(autoTS)
+dates <- seq(lubridate::as_date("2005-01-01"),lubridate::as_date("2010-12-31"),"quarter")
 values <- 10+ 1:length(dates)/10 + rnorm(length(dates),mean = 0,sd = 10)
-\dontrun{
-which.model <- getBestModel(dates,values,freq = "month",n_test = 9)
+\donttest{
+which.model <- getBestModel(dates,values,freq = "quarter",n_test = 4)
 }
 ### Custom set of algorithm (including for bagged estimator)
-\dontrun{
-which.model <- getBestModel(dates,values,freq = "month",n_test = 6,
+which.model <- getBestModel(dates,values,freq = "quarter",n_test = 4,
                             algos = list("my.prophet","my.ets"),bagged = "custom")
-                            }
 ### Use MAE instead of RMSE
-\dontrun{
-which.model <- getBestModel(dates,values,freq = "month",n_test = 6,
+which.model <- getBestModel(dates,values,freq = "quarter",n_test = 3,
                             algos = list("my.prophet","my.ets"),
                             bagged = "custom",metric.error = my.mae)
-                            }
+
 }

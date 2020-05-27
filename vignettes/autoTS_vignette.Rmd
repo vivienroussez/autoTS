@@ -46,9 +46,10 @@ This package implements each algorithm with a unique parametrization, meaning th
 For this example, we will use the GDP quarterly data of the european countries provided by eurostat. The database can be downloaded from [this page](https://ec.europa.eu/eurostat/web/national-accounts/data/database) and then chose "GDP and main components (output, expenditure and income) (namq_10_gdp)" and then adjust the time dimension to select all available data and download as a csv file with the correct formatting (1 234.56). The csv is in the "Data" folder of this notebook.
 
 ```{r}
-unzip("../inst/extdata/namq_10_gdp.zip")
-dat <- read.csv("namq_10_gdp_1_Data.csv")
-file.remove("namq_10_gdp_1_Data.csv","namq_10_gdp_Label.csv")
+tmp_dir <- tempdir() %>% stringr::str_replace("\\\\","/") %>% paste0("/")
+unzip(zipfile = "../inst/extdata/namq_10_gdp.zip",exdir = tmp_dir)
+dat <- read.csv(paste0(tmp_dir,"namq_10_gdp_1_Data.csv"))
+file.remove(paste0(tmp_dir,"namq_10_gdp_1_Data.csv"),paste0(tmp_dir,"namq_10_gdp_Label.csv"))
 str(dat)
 head(dat)
 ```

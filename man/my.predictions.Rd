@@ -33,17 +33,15 @@ the results along with observed data in one final dataframe.
 \examples{
 library(lubridate)
 library(dplyr)
-dates <- seq(lubridate::as_date("2005-01-01"),lubridate::as_date("2010-12-31"),"month")
+dates <- seq(lubridate::as_date("2000-01-01"),lubridate::as_date("2010-12-31"),"quarter")
 values <- 10+ 1:length(dates)/10 + rnorm(length(dates),mean = 0,sd = 10)
 ### Stand alone usage
-\dontrun{
-prepare.ts(dates,values,"month") \%>\%
+prepare.ts(dates,values,"quarter") \%>\%
   my.predictions(prepedTS = .,algos = list("my.prophet","my.ets"))
-  }
 ### Standard input with bestmodel
-\dontrun{
-getBestModel(dates,values,freq = "month",n_test = 6) \%>\%
+\donttest{
+getBestModel(dates,values,freq = "quarter",n_test = 6) \%>\%
   my.predictions()
-  }
+}
 
 }

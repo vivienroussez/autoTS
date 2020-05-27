@@ -28,8 +28,8 @@ ui <- navbarPage("AutoTS graphical interface",
                                           "text/comma-separated-values,text/plain",
                                           ".csv")
                               ),
-                              radioButtons("separator","Separator",c("Comma"=",","Semicolon"=";"),inline = T),
-                              radioButtons("decimal","Decimal separator",c("Dot"=".","Comma"=","),inline = T),
+                              radioButtons("separator","Separator",c("Comma"=",","Semicolon"=";"),inline = TRUE),
+                              radioButtons("decimal","Decimal separator",c("Dot"=".","Comma"=","),inline = TRUE),
                               uiOutput("select_date"),
                               uiOutput("select_var"),
                               selectInput("freq","Seasonality",c("day","week","month","quarter"),selected = "month"),
@@ -79,7 +79,7 @@ server <- function(input, output) {
 
   train <- reactive({
     validate(need(!is.null(dat()),"Waiting for data"))
-    getBestModel(dat()[,input$date],dat()[,input$var],freq = input$freq,graph = F,n_test = input$test_length)
+    getBestModel(dat()[,input$date],dat()[,input$var],freq = input$freq,graph = FALSE,n_test = input$test_length)
   })
 
   pred <- reactive({

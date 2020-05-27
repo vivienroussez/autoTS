@@ -18,18 +18,16 @@
 #' @examples
 #' library(lubridate)
 #' library(dplyr)
-#' dates <- seq(lubridate::as_date("2005-01-01"),lubridate::as_date("2010-12-31"),"month")
+#' dates <- seq(lubridate::as_date("2000-01-01"),lubridate::as_date("2010-12-31"),"quarter")
 #' values <- 10+ 1:length(dates)/10 + rnorm(length(dates),mean = 0,sd = 10)
 #' ### Stand alone usage
-#' \dontrun{
-#' prepare.ts(dates,values,"month") %>%
+#' prepare.ts(dates,values,"quarter") %>%
 #'   my.predictions(prepedTS = .,algos = list("my.prophet","my.ets"))
-#'   }
 #' ### Standard input with bestmodel
-#' \dontrun{
-#' getBestModel(dates,values,freq = "month",n_test = 6) %>%
+#' \donttest{
+#' getBestModel(dates,values,freq = "quarter",n_test = 6) %>%
 #'   my.predictions()
-#'   }
+#'}
 #'
 my.predictions <- function(bestmod=NULL,prepedTS=NULL,
                            algos=list("my.prophet","my.ets", "my.sarima","my.tbats","my.bats","my.stlm","my.shortterm"),
@@ -112,29 +110,24 @@ my.predictions <- function(bestmod=NULL,prepedTS=NULL,
 #' a gg object with the comparison between algorithms and a dataframe with predictions of all tried algorithms,
 #' a dtaframe containing the errors of each algorithms, the preparedTS object and the list of algorithms tested
 #' @examples
-#' library(lubridate)
-#' library(dplyr)
-#' library(ggplot2)
-#' dates <- seq(lubridate::as_date("2005-01-01"),lubridate::as_date("2010-12-31"),"month")
+#' library(autoTS)
+#' dates <- seq(lubridate::as_date("2005-01-01"),lubridate::as_date("2010-12-31"),"quarter")
 #' values <- 10+ 1:length(dates)/10 + rnorm(length(dates),mean = 0,sd = 10)
-#' \dontrun{
-#' which.model <- getBestModel(dates,values,freq = "month",n_test = 9)
+#' \donttest{
+#' which.model <- getBestModel(dates,values,freq = "quarter",n_test = 4)
 #' }
 #' ### Custom set of algorithm (including for bagged estimator)
-#' \dontrun{
-#' which.model <- getBestModel(dates,values,freq = "month",n_test = 6,
+#' which.model <- getBestModel(dates,values,freq = "quarter",n_test = 4,
 #'                             algos = list("my.prophet","my.ets"),bagged = "custom")
-#'                             }
 #' ### Use MAE instead of RMSE
-#' \dontrun{
-#' which.model <- getBestModel(dates,values,freq = "month",n_test = 6,
+#' which.model <- getBestModel(dates,values,freq = "quarter",n_test = 3,
 #'                             algos = list("my.prophet","my.ets"),
 #'                             bagged = "custom",metric.error = my.mae)
-#'                             }
+#'
 
 
 getBestModel <- function(dates,values,
-                         freq,complete=0,n_test=NA,graph=T,
+                         freq,complete=0,n_test=NA,graph=TRUE,
                          algos=list("my.prophet","my.ets", "my.sarima","my.tbats","my.bats","my.stlm","my.shortterm"),
                          bagged="auto",
                          metric.error = my.rmse)
@@ -171,7 +164,7 @@ getBestModel <- function(dates,values,
     tidyr::gather(key="algo",value="val",-.data$dates)
   gg <- ggplot2::ggplot(ddd,ggplot2::aes(.data$dates,.data$val,color=.data$algo)) +
     ggplot2::geom_line() + ggplot2::theme_minimal()
-  if (graph==T)
+  if (graph==TRUE)
   {
     print(gg)
   }
