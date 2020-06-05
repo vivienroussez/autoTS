@@ -60,9 +60,9 @@ my.predictions <- function(bestmod=NULL,prepedTS=NULL,
 
   algos_apply <- lapply(algos,get)
 
-  res <- lapply(algos_apply,function(xx) xx(prepedTS,n_pred)) %>%
-    dplyr::bind_cols(.data) %>%
-    dplyr::select(.data$dates, dplyr::starts_with("prev")) %>%
+  res <- lapply(algos_apply,function(xx) xx(prepedTS,n_pred))
+  res <- Reduce(function(xx,yy) dplyr::left_join(xx,yy,by="dates"),res) %>%
+    # dplyr::select(.data$dates, dplyr::starts_with("prev")) %>%
     tidyr::gather(key="var",value = "val",-.data$dates) %>%
     tidyr::separate(.data$var,into = c("pred","model","type"),sep="\\.") %>%
     dplyr::group_by(.data$dates,.data$type) %>%

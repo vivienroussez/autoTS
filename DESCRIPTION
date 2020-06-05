@@ -1,7 +1,7 @@
 Package: autoTS
 Type: Package
 Title: Automatic Model Selection and Prediction for Univariate Time Series
-Version: 0.9.1
+Version: 0.9.11
 Author: Vivien Roussez
 Maintainer: Vivien Roussez <vivien.roussez@gmail.com>
 Description: Offers a set of functions to easily make predictions for univariate time series. 
@@ -27,6 +27,6 @@ Imports:
     plotly
 BugReports: https://github.com/vivienroussez/autots/issues
 URL: https://github.com/vivienroussez/autoTS
-Suggests: knitr,rmarkdown,stringr,doParallel    
+Suggests: knitr,rmarkdown,stringr    
 VignetteBuilder: knitr
 RoxygenNote: 7.1.0

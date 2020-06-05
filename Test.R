@@ -15,6 +15,7 @@ tt <- getBestModel(dates,values,freq = "week",n_test = 6) %>%
 
 dates <- seq(lubridate::as_date("2018-01-01"),lubridate::as_date("2021-01-01"),"month")
 values <- 100+ 1:length(dates)/10 + rnorm(length(dates),mean = 0,sd = 10)
+prepedTS <- prepare.ts(dates,values,"month")
 ## Find best algo
 system.time({which.model <- getBestModel(dates,values,freq = "month",n_test = 6)})
 ## implement best algo
