@@ -120,10 +120,11 @@ my.predictions <- function(bestmod=NULL,prepedTS=NULL,
 #' which.model <- getBestModel(dates,values,freq = "quarter",n_test = 4,
 #'                             algos = list("my.prophet","my.ets"),bagged = "custom")
 #' ### Use MAE instead of RMSE
+#' \donttest{
 #' which.model <- getBestModel(dates,values,freq = "quarter",n_test = 3,
 #'                             algos = list("my.prophet","my.ets"),
 #'                             bagged = "custom",metric.error = my.mae)
-#'
+#' }
 
 
 getBestModel <- function(dates,values,
